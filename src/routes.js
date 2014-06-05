@@ -1,7 +1,15 @@
 "use strict";
 
 module.exports = {
-  'GET /setup': 'main.setup',
+  'GET /playbooks/:id/addTrigger': [ 'playbooks.loadPlaybook', 'playbooks.newTrigger' ],
+  'POST /playbooks/:id/addTrigger': [ 'bodyParser', 'playbooks.loadPlaybook', 'playbooks.createTrigger' ],
+
+  'GET /playbooks/:id': [ 'playbooks.loadPlaybook', 'playbooks.view' ],
+
+  'GET /playbooks': 'playbooks.index',
+
+  'GET /triggers/:id': 'playbooks.trigger',
+
   'GET /': 'main.index',
 };
 

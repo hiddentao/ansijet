@@ -17,16 +17,16 @@ var debug = require('debug')('waigo-startup-models'),
 module.exports = function*(app) {
   var modelModuleFiles = waigo.getModulesInPath('models');
 
-  debug('Loading ' + modelModuleFiles.length + ' models');
+  debug('Loading models');
 
   app.models = {};
 
   modelModuleFiles.forEach(function(modulePath) {
     var name = path.basename(modulePath);
 
-    debug('Loading model: ' + name);
-
     var modelClass = waigo.load(modulePath)(app.db);
+    
+    debug('Adding model: ' + modelClass.modelName);
 
     app.models[modelClass.modelName] = modelClass;
   });

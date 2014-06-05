@@ -1,0 +1,21 @@
+- var pageTitle = playbook.name
+
+extends layout
+
+block subContent1
+  h2 #{playbook.name}
+
+  h3 Triggers
+
+  if 0 < triggers.length
+    ul
+      - each trigger in triggers
+        li
+          span #{trigger.description}
+          span #{trigger.type}
+          span #{trigger.urlTemplate}
+  else
+    em No triggers set
+
+  a(href="/playbooks/" + playbook.name + "/addTrigger") Add trigger
+

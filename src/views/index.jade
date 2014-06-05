@@ -1,10 +1,23 @@
-doctype html
-html
-  head
-    title #{title}
-  body
-    h1 #{title}
-    :markdown
-      Welcome to your [Waigo](http://waigojs.com) application. The template 
-      for this page is located at `views/index.jade` within your application 
-      source folder.
+- var title = 'Dashboard'
+
+extends layout
+
+
+block content
+  .triggers
+    h2 Triggers
+    ul
+      - each trigger in triggers
+        li
+          span #{trigger.id}
+          span #{trigger.type}
+          span #{trigger.playbook.name}
+
+  .logs
+    h2 Latest runs
+    ul
+      - each log in logs
+        li
+          span #{log.trigger.id}
+          span #{log.txt}
+          span #{log.updated_at}

@@ -2,14 +2,13 @@
 
 
 var mongoose = require('mongoose'),
-  waigo = require('waigo');
+  path = require('path');
+
+var waigo = require('waigo'),
+  schema = waigo.load('support/db/mongoose/schema');
 
 
-var waigoMixins = waigo.load('support/mixins'),
-  viewObjectMethodName = Object.keys(waigoMixins.HasViewObject).pop();
-
-
-var schema = new mongoose.Schema({
+var playbookSchema = schema.create({
   name: {
     type: String,
     index: {
@@ -20,17 +19,20 @@ var schema = new mongoose.Schema({
 });
 
 
-schema.method(viewObjectMethodName, function*() {
-  return {
-    id: this._id.toString(),
-    name: this.key
-  }
-});
+
+playbookSchema.virtual('fullPath').get(function() {
+  var app = waigo.load('application').app;
+
+  return path.join(app.config.ansiblePlaybooksFolder, this.path);
+})
+
 
 
 module.exports = function(dbConn) {
-  return dbConn.model('Playbook', schema);
+  return dbConn.model('Playbook', playbookSchema);
 }
+
+
 
 
 

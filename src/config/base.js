@@ -29,6 +29,7 @@ module.exports = function(config) {
     'database',
     'models',
     'routes',
+    'setupTriggerTypes',
     'setupAnsible',
     'listener'
   ];

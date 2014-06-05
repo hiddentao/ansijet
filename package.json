@@ -28,6 +28,8 @@
     "debug": "~0.8.1",
     "mongoose": "~3.8.12",
     "then-fs": "~1.0.6",
-    "thunkify": "~2.1.2"
+    "thunkify": "~2.1.2",
+    "lodash": "~2.4.1",
+    "bluebird": "~2.0.2"
   }
 }

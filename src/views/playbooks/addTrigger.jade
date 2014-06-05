@@ -1,0 +1,25 @@
+- var pageTitle = 'Add trigger'
+
+extends layout
+
+block subContent1
+  h2 Add trigger for #{playbook.name}
+
+  if error
+    div(style='color:red') #{JSON.stringify(error)}
+
+  form(method="POST")
+    - each fieldName in form.order
+      div
+        - var field = form.fields[fieldName]
+        label #{field.label}
+        if "text" == field.type
+          input(name=field.name, type="text", value=field.value)
+        else if "select" == field.type  
+          select(name=field.name, value=field.value)
+            - each label, val in field.options
+                option(value=val) #{label}
+
+    input(type="submit", value="Submit")
+
+

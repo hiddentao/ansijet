@@ -1,0 +1,12 @@
+extends ../layout
+
+block content
+
+  ul.sidebar
+    - each playbook in playbooks
+      - var liClass = (selectedPlaybookId == playbook.name) ? 'active': ''
+      li(class=liClass)
+        a(href="/playbooks/" + playbook.name) #{playbook.name}
+
+  block subContent1
+    
