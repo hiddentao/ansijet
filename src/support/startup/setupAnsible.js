@@ -16,7 +16,7 @@ var debug = require('debug')('ansibot-startup-git-repo'),
 module.exports = function*(app) {
   debug('Loading Ansible playbooks');
 
-  var files = yield fs.readdir(app.config.ansiblePlaybooksFolder);
+  var files = yield fs.readdir(app.config.ansiblePlaybooks);
 
   for (var i = 0; files.length > i; ++i) {
     var file = files[i];
@@ -34,7 +34,7 @@ module.exports = function*(app) {
 
         var obj = new app.models.Playbook({
           name: name,
-          path: file
+          path: path.join(app.config.ansiblePlaybooks, file)
         });        
 
         yield thunkify(obj.save).call(obj);

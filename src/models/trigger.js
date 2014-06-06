@@ -3,11 +3,12 @@
 
 var _ = require('lodash'),
   mongoose = require('mongoose'),
+  path = require('path'),
   thunkify = require('thunkify');
 
 var waigo = require('waigo'),
   schema = waigo.load('support/db/mongoose/schema'),
-  exec = waigo.load('support/exec');
+  exec = waigo.load('support/exec-then');
 
 
 var triggerSchema = schema.create({
@@ -47,9 +48,9 @@ triggerSchema.method('viewObjectKeys', function(ctx) {
 /**
  * Execute this trigger.
  *
- * @param {Object} req The current request.
+ * @param {Object} query Trigger query parameters.
  */
-triggerSchema.method('execute', function*(req) {
+triggerSchema.method('execute', function*(query) {
   var jobId = parseInt(Math.random() * 20000000).toString(16);
 
   yield this.log(jobId, 'Triggered from: <source>');
@@ -69,7 +70,7 @@ triggerSchema.method('execute', function*(req) {
     this.log(jobId, 'Processing request');
 
     // let trigger type perform its checks
-    var buildVariables = yield triggerType.process(req.query);
+    var buildVariables = yield triggerType.process(query);
 
     // build --extra-vars parameter string
     var extraVars = [];
@@ -78,24 +79,36 @@ triggerSchema.method('execute', function*(req) {
     }
 
     // build final command
-    var cmd = 'ansible-playbook --extra-vars=' 
-        + extraVars.join(',') + ' '  + playbook.fullPath;    
+    var cmd = [ 
+      path.join(app.config.ansibleSource, 'bin', 'ansible-playbook'),
+      '-i ' + path.join(app.config.ansiblePlaybooks, 'hosts'),
+      '--extra-vars=' + extraVars.join(','),
+      playbook.path
+    ].join(' ');
 
     this.log(jobId, 'Cmd: ' + cmd);
 
-
     // execute
-    var ansibleOutput = {};
     try {
-      ansibleOutput = yield exec(cmd);
+      var result = yield exec(cmd, {
+        outputTimeout: 60,
+        env: {
+          'ANSIBLE_LIBRARY': path.join(app.config.ansibleSource, 'library'),
+          'PYTHONPATH': [
+            path.join(app.config.ansibleSource, 'lib'),
+            app.config.pythonSitePackages
+          ].join(':')
+        }
+      });
 
-      yield this.log(jobId, 'stdout: ' + ansibleOutput.stdout);
+      yield this.log(jobId, 'stdout: ' + result.stdout);
 
     } catch (err) {
-      ansibleOutput = err.data;
-
-      yield this.log(jobId, 'exit code: ' + 
-          ansibleOutput.code + ', stdout: ' + ansibleOutput.stdout);
+      // shell exec error?
+      if (undefined !== err.code) {
+        yield this.log(jobId, 'exit code: ' + 
+            err.code + ', stdout: ' + err.stdout);
+      }
 
       throw err;
     }

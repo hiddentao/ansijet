@@ -20,13 +20,6 @@ var playbookSchema = schema.create({
 
 
 
-playbookSchema.virtual('fullPath').get(function() {
-  var app = waigo.load('application').app;
-
-  return path.join(app.config.ansiblePlaybooksFolder, this.path);
-})
-
-
 
 module.exports = function(dbConn) {
   return dbConn.model('Playbook', playbookSchema);

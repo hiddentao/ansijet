@@ -8,7 +8,7 @@ module.exports = {
 
   'GET /playbooks': 'playbooks.index',
 
-  'GET /triggers/:id': 'playbooks.trigger',
+  'GET /invoke/:id': 'trigger.invoke',
 
   'GET /': 'main.index',
 };

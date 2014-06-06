@@ -8,7 +8,6 @@ var path = require('path'),
 module.exports = function(config) {
   waigo.load('waigo:config/base')(config);
 
-
   config.db = {
     mongo: {
       host: '127.0.0.1',
@@ -34,7 +33,14 @@ module.exports = function(config) {
     'listener'
   ];
 
-  config.ansiblePlaybooksFolder = path.join(__dirname, '..', '..', 'ansible', 'ansible');
+
+  /* Set the following values according to your system */
+
+  config.pythonSitePackages = '/usr/local/lib/python2.7/site-packages';
+
+  config.ansibleSource = '/Users/home/dev/ansible/ansible';
+
+  config.ansiblePlaybooks = path.join(__dirname, '..', '..', 'ansible', 'ansible');
 };
 
 

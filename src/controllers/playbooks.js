@@ -16,7 +16,9 @@ var _vars = function*(ctx, templateVars) {
   templateVars.playbooks = yield ctx.app.models.Playbook.find().exec();
 
   // currently selected playbook id
-  templateVars.selectedPlaybookId = ctx.request.params.id;
+  if (ctx.request.params.id) {
+    templateVars.selectedPlaybookId = ctx.request.params.id;
+  }
 
   // current playbook
   if (ctx.playbook) {
@@ -94,22 +96,6 @@ exports.createTrigger = function*() {
     }));
   }
 
-};
-
-
-
-exports.trigger = function*() {
-  var triggerId = this.request.params.id;
-
-  var trigger = yield this.app.models.Trigger.findOne(
-    { _id: triggerId }
-  ).populate('playbook').exec();
-
-  if (!trigger) throw new errors.RuntimeError('Trigger not found');
-
-  yield trigger.execute(this.request);
-
-  this.response.send('ok');
 };
 
 
