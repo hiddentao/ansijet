@@ -2,3 +2,5 @@
 node_modules
 $HOME
 ansible
+npm-debug.log
+frontend/build
