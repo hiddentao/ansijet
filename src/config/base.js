@@ -30,9 +30,14 @@ module.exports = function(config) {
     'routes',
     'setupTriggerTypes',
     'setupAnsible',
+    'setupTemplateHelpers',
     'listener'
   ];
 
+
+  config.middleware.options.staticResources = {
+    folder: '../frontend/build'
+  };
 
   /* Set the following values according to your system */
 

@@ -1,23 +1,35 @@
-- var title = 'Dashboard'
+include ./_mixins
+
+- var pageTitle = 'Dashboard'
 
 extends layout
 
 
 block content
-  .triggers
-    h2 Triggers
-    ul
-      - each trigger in triggers
-        li
-          span #{trigger.id}
-          span #{trigger.type}
-          span #{trigger.playbook.name}
 
-  .logs
-    h2 Latest runs
-    ul
-      - each log in logs
-        li
-          span #{log.trigger.id}
-          span #{log.txt}
-          span #{log.updated_at}
+  #dashboard
+
+    .triggers
+      h1 Active triggers
+      table
+        thead
+          th Description
+          th Playbook
+          th Type
+          th URL template
+        - each trigger in triggers
+          tr
+            td #{trigger.description}
+            td 
+              if trigger.playbook
+                a(href="/playbooks/" + trigger.playbook.name) #{trigger.playbook.name}
+            td #{trigger.type}
+            td
+              +renderUrlTemplate(trigger.urlTemplate)
+
+    .logs
+      h2
+        span Recent logs
+        a.subtitle(href="/logs") View all
+
+      +renderLogTable(logs)

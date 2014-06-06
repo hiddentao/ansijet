@@ -1,13 +1,15 @@
 doctype html
 html
   head
-    title Ansibot - #{title}
+    title Ansibot - #{pageTitle}
+    link(rel="stylesheet", media="all", href="/css/style.css")
   body
     header
+      a.brand(href="/", title="Dashboard homepage") Ansibot      
       nav
         ul
           li
-            a(href="/playbooks") playbooks
+            a(href="/playbooks", title="View settings") Settings
 
     main
       block content

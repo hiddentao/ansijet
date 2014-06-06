@@ -1,0 +1,13 @@
+- var pageTitle = 'Logs'
+
+include ../_mixins
+
+extends ../layout
+
+block content
+
+  #logs
+
+    h1 Logs (latest #{logs.length})
+
+    +renderLogTable(logs)

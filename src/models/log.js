@@ -10,7 +10,8 @@ var waigo = require('waigo'),
 var logSchema = schema.create({
   job: String,
   trigger: { type: mongoose.Schema.Types.ObjectId, ref: 'Trigger' },
-  text: String
+  text: String,
+  meta: { type: mongoose.Schema.Types.Mixed }
 }, {
   // capped: { 
   //   /* 20MB max size, max. 1000 entries */

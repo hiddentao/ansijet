@@ -1,6 +1,102 @@
 @import "./_settings"
 @import "./axis"
 
+@import "./_dashboard"
+
+
+// reset styles
+
 global-reset()
 normalize()
 
+// initialise our grid
+
+grid()
+
+column-width = 60px
+gutter-width = 20px
+columns = 12
+total-width = 100%
+
+// body
+
+base(helvetica, 14, body-fg-color)
+
+body
+  background-color body-bg-color
+
+// header
+
+header
+  clearfix()
+  background-color header-bg-color
+  color header-fg-color
+  size(100%, header-height)
+
+  a.brand
+    reset-link()
+    bold()
+    display block
+    float left
+    font-size 200%
+    text-align center
+    padding 0.2em
+
+  nav
+    display block
+    text-align right
+    height 100%
+
+    ul
+      display block
+      float right
+      inline-list(0px)
+      height header-height
+
+      li
+        inline-block()
+        font-family verdana
+        height 100%
+
+        a
+          inline-block()
+          reset-link()
+          border-left 1px dotted lighten(header-bg-color, 10)
+          border-right 1px dotted lighten(header-bg-color, 10)
+          height nav-btn-height
+          padding nav-btn-padding 1em
+          font-size 120%
+          background-color header-bg-color
+          hover-lighten(15%)
+
+          &:hover
+            border-left 1px dotted lighten(header-bg-color, 10)
+            border-right 1px dotted lighten(header-bg-color, 10)
+            
+
+// main
+
+main
+  padding 1em
+
+
+// general styles
+
+h1, h2
+  .subtitle
+    margin-left 0.6em
+    font-size 60%
+
+table
+  table(false, true, false)
+
+.error 
+  flash(type=error)
+
+.urlTemplate
+  font-family monospace
+  .param
+    cursor help
+    margin 0 0.4em
+    background-color body-bg-color
+    hover-color(text-hover-highlight-color)

@@ -1,0 +1,30 @@
+mixin renderUrlTemplate(urlTemplate)
+  span.urlTemplate
+    span.path #{urlTemplate.path}/
+    span.params
+      - each desc,name in urlTemplate.queryParams
+        span.param(title=desc)
+          span.name #{name}
+          span =
+          span.value ...
+        span &
+
+
+
+mixin renderLogTable(logs)
+  table.logs
+    thead
+      th.time Time
+      th.job Job
+      th Text
+    - each log in logs
+      tr
+        td #{prettyPrintTimestamp(log.updated_at)}
+        td #{log.job}
+        - var textTdClass = (log.meta && log.meta.console ? 'console': '')
+        td(class=textTdClass)
+          if log.meta && (log.meta.console || log.meta.error)
+            - var preClass = log.meta.error ? 'error': ''
+            pre(class=preClass) #{log.text}
+          else
+            div #{log.text}

@@ -14,6 +14,7 @@ var paths = {
   buildFolder: './frontend/build',
   cssBuildFolder: './frontend/build/css',
   cssSrcFiles: './frontend/src/stylus/style.styl',
+  cssSrcFilesWatch: './frontend/src/stylus/*.styl',
 };
 
 
@@ -45,8 +46,8 @@ gulp.task('css', function () {
 
 
 // Rerun the task when a file changes
-gulp.task('watch-assets', ['css'], function() {
-  gulp.watch(paths.cssSrcFiles, ['css']); // watch the same files in our scripts task
+gulp.task('watch', ['css'], function() {
+  gulp.watch(paths.cssSrcFilesWatch, ['css']); // watch the same files in our scripts task
 });
 
 

@@ -31,7 +31,10 @@ triggerSchema.virtual('urlTemplate').get(function() {
 
   var queryStr = _.keys(urlParams).join('=<...>&') + '=<...>';
 
-  return '/triggers/' + this._id + '?' + queryStr;
+  return {
+    path: '/invoke/' + this._id,
+    queryParams: urlParams
+  };
 })
 
 
@@ -101,13 +104,13 @@ triggerSchema.method('execute', function*(query) {
         }
       });
 
-      yield this.log(jobId, 'stdout: ' + result.stdout);
+      yield this.log(jobId, result.stdout, { console: true });
 
     } catch (err) {
       // shell exec error?
       if (undefined !== err.code) {
-        yield this.log(jobId, 'exit code: ' + 
-            err.code + ', stdout: ' + err.stdout);
+        yield this.log(jobId, 'Exit code: ' + 
+            err.code + '\n\n' + err.stdout, { console: true, error: true });
       }
 
       throw err;
@@ -117,7 +120,7 @@ triggerSchema.method('execute', function*(query) {
     yield this.log(jobId, 'Job complete');
 
   } catch (err) {
-    yield this.log(jobId, err.message);
+    yield this.log(jobId, err.message, { error: true });
 
     yield this.log(jobId, 'Job did not complete');
 
@@ -131,14 +134,16 @@ triggerSchema.method('execute', function*(query) {
  * Create a log message entry for this trigger.
  * @param  {String} jobId   Unique id for this job.
  * @param  {String} message The status message.
+ * @param {Object} meta Additiona info about this log.
  */
-triggerSchema.method('log', function*(jobId, message) {
+triggerSchema.method('log', function*(jobId, message, meta) {
   var app = waigo.load('application').app;
 
   var log = new app.models.Log({
     job: jobId,
     trigger: this,
-    text: message
+    text: message,
+    meta: meta || {}
   });
 
   yield thunkify(log.save).call(log);
