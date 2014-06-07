@@ -36,6 +36,9 @@
   "devDependencies": {
     "nib": "~1.0.2",
     "gulp-clean": "~0.3.0",
-    "gulp-minify-css": "~0.3.4"
+    "gulp-minify-css": "~0.3.4",
+    "gulp-concat": "~2.2.0",
+    "gulp-uglify": "~0.3.0",
+    "gulp-gzip": "0.0.8"
   }
 }

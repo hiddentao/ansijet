@@ -1,0 +1,22 @@
+@import "./axis"
+
+flash(type = notice)
+  if type == notice
+    notice(color: #6CC5FA)
+    color: #fff
+    font-weight: bold
+    text-shadow: 1px 1px 1px rgba(#000,.2)
+  if type == success
+    notice(color: #7BDEA3)
+    color: #fff
+    font-weight: bold
+    text-shadow: 1px 1px 1px rgba(#000,.2)
+  if type == warning
+    notice(color: #FAE677)
+    font-weight: bold
+    text-shadow: 1px 1px 1px rgba(#fff,.2)
+  if type == error
+    notice(color: pal1)
+    color: #fff
+    font-weight: bold
+    text-shadow: 1px 1px 1px rgba(#000,.2)
