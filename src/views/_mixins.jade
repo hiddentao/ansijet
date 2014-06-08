@@ -52,6 +52,7 @@ mixin renderExpandableChunk(text, isCode)
   - var showNext = "if (!nextSibling) return; this.nextSibling.style.display = 'block'; this.style.display = 'none'";
   - var showPrev = "if (!previousSibling) return; this.previousSibling.style.display = 'block'; this.style.display = 'none'";
 
+  - text = text || ''
   - var preview = text.substr(0, 100)
   - var tooLong = preview.length < text.length
 
