@@ -15,9 +15,8 @@ var triggerSchema = schema.create({
   description: String,
   type: String,
   playbook: { type: mongoose.Schema.Types.ObjectId, ref: 'Playbook' },
-  params: { type: mongoose.Schema.Types.Mixed }
-}, {
-  addTimestampFields: true
+  params: { type: mongoose.Schema.Types.Mixed, default: {} },
+  created_at: { type: Date, default: Date.now }
 });
 
 
@@ -28,8 +27,6 @@ triggerSchema.virtual('urlTemplate').get(function() {
   var app = waigo.load('application').app;
 
   var urlParams = app.triggerTypes[this.type].urlParams;
-
-  var queryStr = _.keys(urlParams).join('=<...>&') + '=<...>';
 
   return {
     path: '/invoke/' + this._id,
@@ -51,12 +48,12 @@ triggerSchema.method('viewObjectKeys', function(ctx) {
 /**
  * Execute this trigger.
  *
- * @param {Object} query Trigger query parameters.
+ * @param {Object} req Request context.
  */
-triggerSchema.method('execute', function*(query) {
+triggerSchema.method('execute', function*(req) {
   var jobId = parseInt(Math.random() * 20000000).toString(16);
 
-  yield this.log(jobId, 'Triggered from: <source>');
+  yield this.log(jobId, 'Triggered from: ' + req.ip);
 
   try {
     var app = waigo.load('application').app;
@@ -73,7 +70,7 @@ triggerSchema.method('execute', function*(query) {
     this.log(jobId, 'Processing request');
 
     // let trigger type perform its checks
-    var buildVariables = yield triggerType.process(query);
+    var buildVariables = yield triggerType.process(req.query);
 
     // build --extra-vars parameter string
     var extraVars = [];

@@ -1,30 +1,102 @@
 mixin renderUrlTemplate(urlTemplate)
   span.urlTemplate
-    span.path #{urlTemplate.path}/
-    span.params
-      - each desc,name in urlTemplate.queryParams
-        span.param(title=desc)
-          span.name #{name}
-          span =
-          span.value ...
-        span &
+    span.path #{urlTemplate.path}
+    if !_.isEmpty(urlTemplate.queryParams)
+      span ?
+      span.params
+        - each meta,name in urlTemplate.queryParams
+          span.param(title=meta.desc)
+            span.name #{name}
+            span =
+            span.value #{meta.value}
+          span.qryStringSpacer &
 
 
 
-mixin renderLogTable(logs)
-  table.logs
-    thead
-      th.time Time
-      th.job Job
-      th Text
-    - each log in logs
-      tr
-        td #{prettyPrintTimestamp(log.updated_at)}
-        td #{log.job}
-        - var textTdClass = (log.meta && log.meta.console ? 'console': '')
-        td(class=textTdClass)
-          if log.meta && (log.meta.console || log.meta.error)
-            - var preClass = log.meta.error ? 'error': ''
-            pre(class=preClass) #{log.text}
-          else
-            div #{log.text}
+mixin renderLogTable(logs, hideTriggerColumn)
+  if 0 < logs.length
+    table.logs
+      thead
+        th.time Time
+
+        if !hideTriggerColumn
+          th.trigger Trigger
+
+        th.job Job
+        th.text Text
+      - each log in logs
+        tr
+          td #{prettyPrintTimestamp(log.created_at)}
+
+          if !hideTriggerColumn
+            - var triggerName = log.trigger.description || log.trigger;
+            td(title="View trigger") 
+              a(href="/triggers/" + (log.trigger._id || log.trigger)) #{triggerName}
+
+          td #{log.job}
+
+          - var textTdClass = (log.meta && log.meta.console ? 'console': '')
+          td(class="text " + textTdClass)
+            if log.meta && (log.meta.console || log.meta.error)
+              - var preClass = log.meta.error ? 'error': ''
+              pre(class=preClass) #{log.text}
+            else
+              div
+                +renderExpandableChunk(log.text)
+  else
+    em No logs found
+
+
+
+mixin renderExpandableChunk(text, isCode)
+  - var showNext = "if (!nextSibling) return; this.nextSibling.style.display = 'block'; this.style.display = 'none'";
+  - var showPrev = "if (!previousSibling) return; this.previousSibling.style.display = 'block'; this.style.display = 'none'";
+
+  - var preview = text.substr(0, 100)
+  - var tooLong = preview.length < text.length
+
+  div(class=(tooLong ? 'expandable': ''))
+    if isCode
+      if tooLong
+        pre(onclick=showNext) #{preview}
+          span.indicator Click to expand
+        pre(onclick=showPrev, style="display:none") #{text}
+      else
+        pre #{text}
+    else
+      if tooLong
+        div(onclick=showNext) #{preview}
+          span.indicator Click to expand
+        div(onclick=showPrev, style="display:none") #{text}
+      else
+        div #{text}
+
+
+
+
+
+mixin form(form, submitBtnText)
+  if error
+    div.error #{error.msg}
+
+  - var fieldErrors = error ? error.errors : {}
+
+  form(method="POST")
+    - each fieldName in form.order
+      div.field
+        - var field = form.fields[fieldName]
+        label #{field.label}
+        if "text" == field.type
+          input(name=field.name, type="text", value=field.value)
+        else if "select" == field.type  
+          select(name=field.name, value=field.value)
+            - each label, val in field.options
+                option(value=val) #{label}
+
+        if fieldErrors[fieldName]
+          - each errorMeta, errorId in fieldErrors[fieldName].errors
+            div.error #{errorMeta.msg}
+
+
+    input(type="submit", value=submitBtnText)
+

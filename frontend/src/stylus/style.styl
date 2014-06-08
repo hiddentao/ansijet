@@ -1,21 +1,12 @@
 @import "./_settings"
 @import "./_axis"
-@import "./_dashboard"
+
 
 
 // reset styles
 
 global-reset()
 normalize()
-
-// initialise our grid
-
-grid()
-
-column-width = 60px
-gutter-width = 20px
-columns = 12
-total-width = 100%
 
 // body
 
@@ -81,10 +72,43 @@ main
 
 // general styles
 
+forms()
+code-blocks()
+
+pre
+  margin 0
+
+em
+  italic()
+
 h1, h2
   .subtitle
     margin-left 0.6em
     font-size 60%
+
+h1
+  margin-bottom 1em
+
+h2
+  margin-top 2em
+
+form
+  .field
+    margin 2em 0
+    .error
+      margin-top 0.1em
+  label
+    bold()
+    &:after
+      content ': '
+      bold()
+  input[type=text]
+    input(pal4)
+  input[type=submit]
+    button(pal4)
+
+a.btn
+  button(pal4)
 
 table
   table(false, true, false)
@@ -94,8 +118,54 @@ table
 
 .urlTemplate
   font-family monospace
-  .param
-    cursor help
-    margin 0 0.4em
-    background-color body-bg-color
-    hover-color(text-hover-highlight-color)
+
+  .params
+    .param
+      cursor help
+      margin 0 0.4em
+      background-color body-bg-color
+      hover-color(text-hover-highlight-color)
+
+      .value
+        bold()
+
+    span.qryStringSpacer:last-child
+      display: none;
+
+
+
+
+.info
+  div
+    margin 1em 0
+    & > span.label
+      bold()
+
+      &:after
+        content: ':'
+        margin-right 1em
+
+
+div.expandable
+  position relative
+  cursor pointer
+
+  & > div
+    padding 0.2em
+    border 1px solid #ccc
+    border-radius(2px)
+
+  span.indicator
+    display inline-block
+    position absolute
+    top 0px
+    right 0px
+    background-color pal5
+    color #fff
+    padding 0.2em
+
+
+
+@import "./_dashboard"
+@import "./_playbooks"
+@import "./_logs"

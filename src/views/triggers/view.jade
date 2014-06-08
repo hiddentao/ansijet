@@ -1,0 +1,40 @@
+- var pageTitle = 'Trigger'
+
+include ../_mixins
+
+extends ../layout
+
+block content
+
+  #trigger
+
+    h1 Trigger: #{trigger.description}
+
+    .info
+      .playbook
+        span.label Playbook
+        span
+          a(href=trigger.playbook.settingsUrl) #{trigger.playbook.name}
+      .type
+        span.label Type
+        span #{trigger.type}
+      .url
+        span.label URL
+        span
+          +renderUrlTemplate(trigger.urlTemplate)
+      if !_.isEmpty(trigger.params)
+      .config
+        span.label Config
+        table
+          thead
+            th Param
+            th Value
+          - each value, key in trigger.params
+            tr
+              td #{key}
+              td #{value}
+
+
+    h2 Recent logs (latest #{logs.length})
+
+    +renderLogTable(logs, true)

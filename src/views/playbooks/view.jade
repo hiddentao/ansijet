@@ -1,21 +1,31 @@
 - var pageTitle = playbook.name
 
+include ../_mixins
+
 extends layout
 
 block subContent1
-  h2 #{playbook.name}
+  #playbook
+    h1 Playbook: #{playbook.name}
 
-  h3 Triggers
+    +renderExpandableChunk(code, true)
 
-  if 0 < triggers.length
-    ul
-      - each trigger in triggers
-        li
-          span #{trigger.description}
-          span #{trigger.type}
-          span #{trigger.urlTemplate}
-  else
-    em No triggers set
+    h2 Triggers
 
-  a(href="/playbooks/" + playbook.name + "/addTrigger") Add trigger
+    .triggers
+      if 0 < triggers.length
+        table
+          thead
+            th Description
+            th Type
+          - each trigger in triggers
+            tr
+              td #{trigger.description}
+              td #{trigger.type}
+              td 
+                a(href="/triggers/" + trigger._id) more &raquo;
+      else
+        em No triggers set
+
+    a.btn.addTrigger(href=playbook.settingsUrl + "/addTrigger") Add trigger
 

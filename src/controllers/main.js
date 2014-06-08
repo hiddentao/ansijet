@@ -6,7 +6,7 @@ exports.index = function*(next) {
   var triggers = yield this.app.models.Trigger.find().populate('playbook').exec();
 
   // load latest 10 logs
-  var logs = yield this.app.models.Log.find().sort({updated_at: -1}).limit(30).exec();
+  var logs = yield this.app.models.Log.find().populate('trigger').sort({created_at: -1}).limit(30).exec();
 
   yield this.render('index', {
     triggers: triggers,

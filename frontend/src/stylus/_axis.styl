@@ -12,7 +12,7 @@ flash(type = notice)
     font-weight: bold
     text-shadow: 1px 1px 1px rgba(#000,.2)
   if type == warning
-    notice(color: #FAE677)
+    notice(color: lighten(pal1, 40%))
     font-weight: bold
     text-shadow: 1px 1px 1px rgba(#fff,.2)
   if type == error

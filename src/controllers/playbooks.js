@@ -1,4 +1,5 @@
-var thunkify = require('thunkify'),
+var _ = require('lodash'),
+  thunkify = require('thunkify'),
   waigo = require('waigo');
 
 
@@ -49,54 +50,125 @@ exports.index = function*() {
 exports.view = function*() {
   var triggers = 
     yield this.app.models.Trigger.find({playbook: this.playbook._id})
-            .sort({updated_at: 1}).exec();
+            .sort({created_at: 1}).exec();
 
   var triggerTypes = 
     yield this.app.models.Trigger.find({playbook: this.playbook._id})
-            .sort({updated_at: 1}).exec();
+            .sort({created_at: 1}).exec();
 
   yield this.render('playbooks/view', yield _vars(this, {
+    code: yield this.playbook.getCode(),
     triggers: triggers
   }));
 };
 
 
-exports.newTrigger = function*() {
-  var f = Form.new('addTrigger');
+
+
+
+exports.addTrigger_getStep1 = function*() {
+  var addTriggerForm = Form.new('addTrigger');
 
   yield this.render('playbooks/addTrigger', yield _vars(this, {
-    form: f
+    form: addTriggerForm
   }));
 };
 
 
-exports.createTrigger = function*() {
+
+exports.addTrigger_submitStep1 = function*() {
   try {
-    var f = Form.new('addTrigger');
-    yield f.setValues(this.request.body);
-    yield f.validate();    
+    var addTriggerForm = Form.new('addTrigger');
+    yield addTriggerForm.setValues(this.request.body);
+    yield addTriggerForm.validate();    
 
-    // save trigger
-    var trigger = new this.app.models.Trigger({
-      playbook: this.playbook._id,
-      description: f.fields.description.value,
-      type: f.fields.type.value
-    });
+    // put state into session and show next form
+    this.session.createTriggerFormState = addTriggerForm.state;
 
-    yield thunkify(trigger.save).call(trigger);
-
-    this.response.redirect('/playbooks/' + this.request.params.id);
-
+    this.response.redirect(this.playbook.settingsUrl + '/addTrigger/step2')
   } catch (err) {
     this.response.status = 400;
 
     yield this.render('playbooks/addTrigger', yield _vars(this, {
-      form: f,
+      form: addTriggerForm,
       error: err
     }));
   }
 
 };
 
+
+
+
+exports.addTrigger_getStep2 = function*() {
+  // ensure we do step 1 first
+  if (!this.session.createTriggerFormState) {
+    this.response.redirect('/playbooks/' + this.playbook._id + '/addTrigger');
+  }
+
+  // get trigger type
+  var addTriggerForm = Form.new('addTrigger');
+  addTriggerForm.state = this.session.createTriggerFormState;
+
+  var triggerType = addTriggerForm.fields.type.value,
+    paramsForm = yield this.app.triggerTypes[triggerType].getParamsForm();
+
+
+  // show its form
+  yield this.render('playbooks/addTriggerStep2', yield _vars(this, {
+    form: paramsForm
+  }));
+};
+
+
+
+
+exports.addTrigger_submitStep2 = function*() {
+  // ensure we do step 1 first
+  if (!this.session.createTriggerFormState) {
+    throw new Error('Need to do step 1 first');
+  }
+
+  // get trigger type
+  var addTriggerForm = Form.new('addTrigger');
+  addTriggerForm.state = this.session.createTriggerFormState;
+
+  var triggerType = addTriggerForm.fields.type.value,
+    paramsForm = yield this.app.triggerTypes[triggerType].getParamsForm();
+
+  try {
+    // validate
+    yield paramsForm.setValues(this.request.body);
+    yield paramsForm.validate();
+
+    // param key value pairs
+    var paramFields = paramsForm.fields;
+    var paramKeyValues = _.mapValues(paramFields, function(field) {
+      return field.value;
+    });
+
+    // save trigger
+    var trigger = new this.app.models.Trigger({
+      playbook: this.playbook._id,
+      description: addTriggerForm.fields.description.value,
+      type: addTriggerForm.fields.type.value,
+      params: paramKeyValues
+    });
+
+    yield thunkify(trigger.save).call(trigger);
+
+    // clear saved session var
+    delete this.session.createTriggerFormState;
+
+    this.response.redirect(this.playbook.settingsUrl);
+  } catch (err) {
+    this.response.status = 400;
+
+    yield this.render('playbooks/addTriggerStep2', yield _vars(this, {
+      form: paramsForm,
+      error: err
+    }));
+  }
+};
 
 

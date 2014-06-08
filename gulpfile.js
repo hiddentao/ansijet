@@ -19,8 +19,11 @@ var paths = {
   cssSrcFiles: './frontend/src/stylus/style.styl',
   cssSrcFilesWatch: './frontend/src/stylus/*.styl',
 
-  jsSrcFiles: './frontend/src/js/**/*.js',
-  jsBuildFolder: './frontend/build/js',
+  // jsSrcFiles: [
+  //   './frontend/src/js/**/*.js',
+  //   './frontend/src/bower_components/**/*.js',
+  // ],
+  // jsBuildFolder: './frontend/build/js',
 };
 
 
@@ -47,28 +50,28 @@ gulp.task('css', function () {
     }) )
     .pipe( gulp.dest( paths.cssBuildFolder ) )
     .pipe( gzip({ gzipOptions: { level: 9 } }) ) 
-    .pipe( gulp.dest(paths.jsBuildFolder) )
+    .pipe( gulp.dest(paths.cssBuildFolder) )
     ;
 });
 
 
 
-gulp.task('js', function() {
-  return gulp.src( paths.jsSrcFiles )
-    .pipe( concat() )
-    .pipe( uglify() )
-    .pipe( gulp.dest(paths.jsBuildFolder) )
-    .pipe( gzip({ gzipOptions: { level: 9 } }) ) 
-    .pipe( gulp.dest(paths.jsBuildFolder) )
-    ;
-})
+// gulp.task('js', function() {
+//   return gulp.src( paths.jsSrcFiles )
+//     .pipe( concat() )
+//     .pipe( uglify() )
+//     .pipe( gulp.dest(paths.jsBuildFolder) )
+//     .pipe( gzip({ gzipOptions: { level: 9 } }) ) 
+//     .pipe( gulp.dest(paths.jsBuildFolder) )
+//     ;
+// })
 
 
 
 // Rerun the task when a file changes
-gulp.task('watch', ['css', 'js'], function() {
+gulp.task('watch', ['css'], function() {
   gulp.watch(paths.cssSrcFilesWatch, ['css']); // watch the same files in our scripts task
-  gulp.watch(paths.jsSrcFiles, ['js']); // watch the same files in our scripts task
+  // gulp.watch(paths.jsSrcFiles, ['js']); // watch the same files in our scripts task
 });
 
 

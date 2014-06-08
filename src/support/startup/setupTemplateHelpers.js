@@ -17,13 +17,16 @@ module.exports = function*(app) {
   debug('Setting template helpers');
 
   app.locals = {
+    _: require('lodash'),
+
     /**
      * Pretty-print a timestamp.
      * @param {Date|String} date The date
      */
     prettyPrintTimestamp: function(date) {
       return moment(date).format('YYYY-MMM-D HH:mm:ss');
-    }
+    },
+
   };
 };
 

@@ -19,7 +19,8 @@ module.exports = function(config) {
   config.middleware.order = [
     'errorHandler',
     'staticResources',
-    'outputFormats'
+    'outputFormats',
+    'sessions'
   ];
 
   config.startupSteps = [

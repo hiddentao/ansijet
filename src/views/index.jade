@@ -16,16 +16,15 @@ block content
           th Description
           th Playbook
           th Type
-          th URL template
         - each trigger in triggers
           tr
             td #{trigger.description}
             td 
               if trigger.playbook
-                a(href="/playbooks/" + trigger.playbook.name) #{trigger.playbook.name}
+                a(href=trigger.playbook.settingsUrl) #{trigger.playbook.name}
             td #{trigger.type}
-            td
-              +renderUrlTemplate(trigger.urlTemplate)
+            td 
+              a(href="/triggers/" + trigger._id) more &raquo;
 
     .logs
       h2

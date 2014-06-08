@@ -1,7 +1,7 @@
 {
   "name": "ansibot",
   "version": "0.1.0",
-  "description": "Ansible web UI and REST API",
+  "description": "Ansible automation server",
   "main": "index.js",
   "scripts": {
     "test": "node --harmony `which grunt`"
