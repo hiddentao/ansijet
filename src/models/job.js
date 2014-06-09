@@ -15,11 +15,16 @@ var jobSchema = schema.create({
   trigger: { type: mongoose.Schema.Types.ObjectId, ref: 'Trigger' },
   source: String,
   queryParams: { type: mongoose.Schema.Types.Mixed, default: {} },
-  result: { type: String, default: 'created' },
+  status: { type: String, default: 'created' },
   created_at: { type: Date, default: Date.now }
 });
 
 
+
+
+jobSchema.method('_save', function*() {
+  yield thunkify(this.save).call(this);
+});
 
 
 
@@ -28,31 +33,34 @@ var jobSchema = schema.create({
  *
  * @param {Object} req Request context.
  */
-jobSchema.method('execute', function*(req) {
+jobSchema.method('execute', function*() {
+  this.status = 'processing';
+  yield this._save();
+
   yield this.log('Triggered from ' + this.source, {
-    data: queryParams
+    data: this.queryParams
   });
 
   try {
     var app = waigo.load('application').app;
 
     // trigger
-    var trigger = yield app.models.Trigger.findOne(this.trigger).exec();
+    var trigger = yield app.models.Trigger.getOne(this.trigger);
 
     // trigger type
     var triggerType = new app.triggerTypes[trigger.type];
 
     // playbook
-    var playbook = yield app.models.Playbook.findOne(this.trigger.playbook).exec();
+    var playbook = yield app.models.Playbook.getOne(this.trigger.playbook);
     if (!playbook) {
       throw new Error('Playbook not found');
     }
 
-    this.log('Processing request');
-
     // let trigger type perform its checks
     var buildVariables = 
       yield triggerType.process(this.trigger.configParams, this.queryParams);
+
+    yield this.log('Ansible variables: ' + JSON.stringify(buildVariables), { console: true });
 
     // build --extra-vars parameter string
     var extraVars = [];
@@ -63,51 +71,45 @@ jobSchema.method('execute', function*(req) {
     // build final command
     var cmd = [ 
       path.join(app.config.ansibleSource, 'bin', 'ansible-playbook'),
+      '-v',
       '-i ' + path.join(app.config.ansiblePlaybooks, 'hosts'),
       '--extra-vars=' + extraVars.join(','),
       playbook.path
     ].join(' ');
 
-    this.log('Cmd: ' + cmd, { console: true });
+    yield this.log(cmd, { console: true });
 
     // execute
-    try {
-      var result = yield exec(cmd, {
-        outputTimeout: 60,
-        env: {
-          'ANSIBLE_LIBRARY': path.join(app.config.ansibleSource, 'library'),
-          'PYTHONPATH': [
-            path.join(app.config.ansibleSource, 'lib'),
-            app.config.pythonSitePackages
-          ].join(':')
-        }
-      });
-
-      yield this.log(result.stdout, { console: true });
-
-    } catch (err) {
-      // shell exec error?
-      if (undefined !== err.code) {
-        yield this.log('Exit code: ' + 
-            err.code + '\n\n' + err.stdout, { console: true, error: true });
+    var result = yield exec(cmd, {
+      outputTimeout: 60,
+      env: {
+        'ANSIBLE_LIBRARY': path.join(app.config.ansibleSource, 'library'),
+        'PYTHONPATH': [
+          path.join(app.config.ansibleSource, 'lib'),
+          app.config.pythonSitePackages
+        ].join(':')
       }
+    });
 
-      throw err;
-    }
-
+    yield this.log(result.stdout, { console: true });
 
     yield this.log('Job complete');
-    this.result = 'success';
+
+    this.result = 'completed';
 
   } catch (err) {
-    yield this.log(err.message, { error: true });
+    if (undefined !== err.code) {
+      yield this.log('Exit code: ' + err.code + '\n\n' 
+          + err.stdout, { console: true, error: true });
+    } else {
+      yield this.log(err.message, { error: true });
+    }
 
     yield this.log('Job did not complete');
-    this.result = 'failed';
+    this.status = 'failed';
   } finally {
-    yield thunkify(this.save).call(this);
+    yield this._save();
   }
-
 });
 
 
@@ -145,7 +147,7 @@ jobSchema.method('log', function*(message, meta) {
  */
 jobSchema.method('viewObjectKeys', function(ctx) {
   return ['_id', 'trigger', 'source', 'queryParams', 
-  'result', 'created_at', 'viewUrl'];
+                'status', 'created_at', 'viewUrl'];
 });
 
 
@@ -154,10 +156,44 @@ jobSchema.method('viewObjectKeys', function(ctx) {
  * Find active jobs.
  * @return {Promise} 
  */
-jobSchema.static('findActive', function() {
+jobSchema.static('getActive', function() {
   return this.find({
-    result: 'created'
+    status: { '$in': ['created', 'processing'] }
   }).sort({created_at: -1}).populate('trigger').exec();
+});
+
+
+
+/** 
+ * Find pending jobs.
+ * @return {Promise} 
+ */
+jobSchema.static('getPending', function(limit) {
+  return this.find({
+    status: 'created'
+  }).sort({created_at: -1}).populate('trigger').limit(limit || 1000).exec();
+});
+
+
+
+/**
+ * Get for trigger
+ * @return {Promise} 
+ */
+jobSchema.static('getForTrigger', function(triggerId) {
+  return this.find({
+    trigger: triggerId
+  }).sort({created_at: -1}).populate('trigger').exec();
+});
+
+
+
+/**
+ * Get a job
+ * @return {Promise} 
+ */
+jobSchema.static('getOne', function(id) {
+  return this.findById(id).populate('trigger').exec();
 });
 
 

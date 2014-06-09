@@ -18,10 +18,10 @@ block content
             th Trigger
           - each job in jobs
             tr
-              td #{prettyPrintDate(job.created_at)}
+              td #{prettyPrintTimestamp(job.created_at)}
               td
                 a(href=job.viewUrl) #{job._id}
               td
-                a(href=trigger.viewUrl) #{trigger.description}
+                a(href=job.trigger.viewUrl) #{job.trigger.description}
       else
         em No active jobs

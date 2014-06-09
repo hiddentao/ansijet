@@ -83,6 +83,36 @@ triggerSchema.method('viewObjectKeys', function(ctx) {
 
 
 
+/**
+ * Get all triggers
+ * @return {Promise} 
+ */
+triggerSchema.static('getAll', function() {
+  return this.find().sort({created_at: -1}).populate('playbook').exec();
+});
+
+
+
+/**
+ * Get for playbook
+ * @return {Promise} 
+ */
+triggerSchema.static('getForPlaybook', function(playbookId) {
+  return this.find({
+    playbook: playbookId
+  }).sort({created_at: -1}).populate('playbook').exec();
+});
+
+
+
+/**
+ * Get a triggers
+ * @return {Promise} 
+ */
+triggerSchema.static('getOne', function(id) {
+  return this.findById(id).populate('playbook').exec();
+});
+
 
 
 

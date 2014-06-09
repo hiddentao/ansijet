@@ -37,16 +37,20 @@ mixin renderLogTable(logs, hideTriggerColumn, hideJobColumn)
 
           if !hideJobColumn
             td 
-              a(title="View job", href="/jobs/" + log.job._id) #{log.job._id}
+              a(title="View job", href=log.job.viewUrl) #{log.job._id}
 
           - var textTdClass = (log.meta && log.meta.console ? 'console': '')
           td(class="text " + textTdClass)
             if log.meta && (log.meta.console || log.meta.error)
               - var preClass = log.meta.error ? 'error': ''
-              pre(class=preClass) #{log.text}
+              +renderExpandableChunk(log.text, true, preClass)
             else
-              div
-                +renderExpandableChunk(log.text)
+              +renderExpandableChunk(log.text)
+
+            // additional data
+            if log.meta && log.meta.data
+              code #{JSON.stringify(log.meta.data)}
+
   else
     em No logs found
 
@@ -56,45 +60,49 @@ mixin renderJobTable(logs)
   if 0 < jobs.length
     table.jobs
       thead
-        th.time Time
         th.job Job
+        th.time Time
         th.source Source
         th.params Params
-        th.result Result
-      - each log in logs
+        th.status Status
+      - each job in jobs
         tr
-          td #{prettyPrintTimestamp(job.created_at)}
           td
-            a(href="/jobs/" + job._id) #{job._id}
+            a(href=job.viewUrl) #{job._id}
+          td #{prettyPrintTimestamp(job.created_at)}
           td #{job.source}
           td
-            pre #{JSON.stringify(job.params)}
-          td
-            - var resultClass = ('success' === job.result ? 'success': 'error')
-            span(class=resultClass) #{job.result}
+            if !_.isEmpty(job.queryParams)
+              pre #{JSON.stringify(job.params)}
+            else
+              em -
+          td.status
+            - var resultClass = ('failed' === job.status ? 'error': '')
+            span(class=resultClass) #{job.status}
   else
     em No jobs found
 
 
 
-mixin renderExpandableChunk(text, isCode)
+mixin renderExpandableChunk(text, isCode, cssClasses)
   - text = text || ''
+  - cssClasses = cssClasses || ''
   - var preview = text.substr(0, 100)
   - var tooLong = preview.length < text.length
 
   div(class=(tooLong ? 'expandable': ''))
     if isCode
       if tooLong
-        pre.collapsed #{preview}
+        pre(class=cssClasses + ' collapsed') #{preview}
           span.indicator Click to expand
-        pre.expanded #{text}
+        pre(class=cssClasses + ' expanded') #{text}
       else
         pre #{text}
     else
       if tooLong
-        div.collapsed #{preview}
+        div(class=cssClasses + ' collapsed') #{preview}
           span.indicator Click to expand
-        div.expanded #{text}
+        div(class=cssClasses + ' expanded') #{text}
       else
         div #{text}
 

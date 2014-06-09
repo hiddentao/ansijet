@@ -39,6 +39,35 @@ playbookSchema.method('getCode', function*() {
 })
 
 
+
+/**
+ * Get all triggers
+ * @return {Promise} 
+ */
+playbookSchema.static('getAll', function() {
+  return this.find().sort({name: 1}).exec();
+});
+
+
+/**
+ * Get a trigger by name
+ * @return {Promise} 
+ */
+playbookSchema.static('getByName', function(name) {
+  return this.findOne({name: name}).exec();
+});
+
+
+/**
+ * Get a trigger
+ * @return {Promise} 
+ */
+playbookSchema.static('getOne', function(id) {
+  return this.findById(id).exec();
+});
+
+
+
 /**
  * @override
  */

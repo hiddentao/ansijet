@@ -17,9 +17,13 @@ module.exports = {
       type: 'select',
       label: 'Type',
       options: function*() {
-        var values = _.keys(waigo.load('application').app.triggerTypes);
+        var values = _.mapValues(
+          waigo.load('application').app.triggerTypes, function(Type, key) {
+            return key + ' - ' + new Type().description;
+          }
+        );
 
-        return _.zipObject(values, values);
+        return values;
       }
     }
   ]

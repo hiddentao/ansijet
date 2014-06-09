@@ -18,6 +18,8 @@ module.exports = function(config) {
   /** Path to Ansible playbooks */
   config.ansiblePlaybooks = path.join(__dirname, '..', '..', 'ansible', 'ansible');
 
+  /** Max no. of jobs to execute in parallel */
+  config.jobsInParallel = 2;
 
   // ------------- STOP EDITING --------------- //
 
@@ -48,9 +50,9 @@ module.exports = function(config) {
     'setupTriggerTypes',
     'setupAnsible',
     'setupTemplateHelpers',
-    'listener'
+    'listener',
+    'startJobProcessor'
   ];
-
 
   config.middleware.options.staticResources = {
     folder: '../frontend/build'

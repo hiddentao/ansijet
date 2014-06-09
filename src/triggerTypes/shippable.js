@@ -9,7 +9,9 @@ var waigo = require('waigo'),
 
 
 
-var Shippable = module.exports = function() {};
+var Shippable = module.exports = function() {
+  TriggerType.call(this, 'Trigger deployments from Shippable.com builds');
+};
 util.inherits(Shippable, TriggerType);
 
 
@@ -75,6 +77,8 @@ Shippable.prototype.process = function*(configParams, queryParams) {
     shippable_build_artifacts_url: artifactsUrl,
   };
 };
+
+
 
 
 

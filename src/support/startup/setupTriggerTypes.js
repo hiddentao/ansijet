@@ -2,7 +2,7 @@
 
 
 
-var debug = require('debug')('waigo-startup-trigger-types'),
+var debug = require('debug')('ansibot-startup-trigger-types'),
   path = require('path'),
   waigo = require('waigo');
 

@@ -2,7 +2,7 @@
 
 
 
-var debug = require('debug')('waigo-startup-template-helpers'),
+var debug = require('debug')('ansibot-startup-template-helpers'),
   moment = require('moment');
 
 

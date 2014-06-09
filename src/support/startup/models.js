@@ -2,7 +2,7 @@
 
 
 
-var debug = require('debug')('waigo-startup-models'),
+var debug = require('debug')('ansibot-startup-models'),
   path = require('path'),
   waigo = require('waigo');
 

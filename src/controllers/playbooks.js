@@ -14,7 +14,7 @@ var errors = waigo.load('support/errors'),
 var _vars = function*(ctx, templateVars) {
   templateVars = templateVars || {};
 
-  templateVars.playbooks = yield ctx.app.models.Playbook.find().exec();
+  templateVars.playbooks = yield ctx.app.models.Playbook.getAll();
 
   // currently selected playbook id
   if (ctx.request.params.id) {
@@ -33,9 +33,8 @@ var _vars = function*(ctx, templateVars) {
 
 // middleware for this section of routes
 exports.loadPlaybook = function*(next) {
-  this.playbook = yield this.app.models.Playbook.findOne(
-    {name: this.request.params.id}
-  ).exec();
+  this.playbook = 
+    yield this.app.models.Playbook.getByName(this.request.params.id);
 
   yield next;
 }
@@ -49,12 +48,7 @@ exports.index = function*() {
 
 exports.view = function*() {
   var triggers = 
-    yield this.app.models.Trigger.find({playbook: this.playbook._id})
-            .sort({created_at: 1}).exec();
-
-  var triggerTypes = 
-    yield this.app.models.Trigger.find({playbook: this.playbook._id})
-            .sort({created_at: 1}).exec();
+    yield this.app.models.Trigger.getForPlaybook(this.playbook._id);
 
   yield this.render('playbooks/view', yield _vars(this, {
     code: yield this.playbook.getCode(),

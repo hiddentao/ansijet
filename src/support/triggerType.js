@@ -12,9 +12,12 @@ var waigo = require('waigo'),
  *
  * Trigger types represent the different ways in which a `Trigger` can be 
  * invoked.
+ *
+ * @param {String} description Description of this trigger type.
+ * @constructor
  */
-var TriggerType = module.exports = function() {
-
+var TriggerType = module.exports = function(description) {
+  this.description = description;
 };
 
 

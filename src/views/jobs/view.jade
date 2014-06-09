@@ -14,34 +14,23 @@ block content
       .trigger
         span.label Trigger
         span
-          a(href=trigger.viewUrl) #{job.trigger.name}
+          a(href=job.trigger.viewUrl) #{job.trigger.description}
 
-      .url
-        span.label Request URL
-        span
-          +renderUrlTemplate(trigger.urlTemplate)
-      if !_.isEmpty(trigger.ansibleVars)
-      .ansibleVars
-        span.label Ansible variables
-        table
-          thead
-            th Name
-            th Value
-            th Description
-          - each meta, key in trigger.ansibleVars
-            tr
-              td #{key}
-              td 
-                case meta.type
-                  when 'config'
-                    span #{meta.value}
-                  when 'query'
-                    em Obtained from request
-                  when 'generated'
-                    em Generated from request
-              td #{meta.desc}
+      .time
+        span.label Started
+        span #{prettyPrintTimestamp(job.created_at)}
 
-
+      if !_.isEmpty(job.queryParams)
+        .queryParams
+          span.label Query parameters
+          table
+            thead
+              th Name
+              th Value
+            - each value, key in job.queryParams
+              tr
+                td #{key}
+                td.code #{value}
 
 
     h2 Logs

@@ -21,6 +21,31 @@ var logSchema = schema.create({
 });
 
 
+/**
+ * Get for job
+ * @return {Promise} 
+ */
+logSchema.static('getForJob', function(jobId) {
+  return this.find({
+    job: jobId
+  }).sort({created_at: -1}).populate('job').populate('trigger').exec();
+});
+
+
+
+/**
+ * Get recent
+ *
+ * @param {Number} [maxNumToFetch] Max. no. of items to fetch. Default is 1000.
+ * @return {Promise} 
+ */
+logSchema.static('getRecent', function(maxNumToFetch) {
+  maxNumToFetch = maxNumToFetch || 1000;
+
+  return this.find().sort({created_at: -1})
+    .populate('job').populate('trigger').limit(maxNumToFetch).exec();
+});
+
 
 
 module.exports = function(dbConn) {

@@ -26,29 +26,29 @@ block content
         span
           +renderUrlTemplate(trigger.invokeUrlTemplate)
       if !_.isEmpty(trigger.ansibleVars)
-      .ansibleVars
-        span.label Ansible variables
-        table
-          thead
-            th Name
-            th Value
-            th Description
-          - each meta, key in trigger.ansibleVars
-            tr
-              td #{key}
-              td 
-                case meta.type
-                  when 'config'
-                    code #{meta.value}
-                  when 'query'
-                    em Obtained from request
-                  when 'generated'
-                    em Generated from request
-              td #{meta.desc}
+        .ansibleVars
+          span.label Ansible variables
+          table
+            thead
+              th Name
+              th Value
+              th Description
+            - each meta, key in trigger.ansibleVars
+              tr
+                td #{key}
+                td 
+                  case meta.type
+                    when 'config'
+                      code #{meta.value}
+                    when 'query'
+                      em Obtained from request
+                    when 'generated'
+                      em Generated from request
+                td #{meta.desc}
 
 
 
 
-    h2 Recent jobs (latest #{jobs.length})
+      h2 Recent jobs (latest #{jobs.length})
 
-    +renderJobTable(jobs)
+      +renderJobTable(jobs)
