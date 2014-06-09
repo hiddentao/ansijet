@@ -20,12 +20,12 @@ block subContent1
             th Type
           - each trigger in triggers
             tr
-              td #{trigger.description}
+              td
+                a(href=trigger.viewUrl, title="View trigger") #{trigger.description}
               td #{trigger.type}
-              td 
-                a(href="/triggers/" + trigger._id) more &raquo;
+                
       else
         em No triggers set
 
-    a.btn.addTrigger(href=playbook.settingsUrl + "/addTrigger") Add trigger
+    a.btn.addTrigger(href=playbook.viewUrl + "/addTrigger") Add trigger
 

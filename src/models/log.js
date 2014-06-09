@@ -8,7 +8,7 @@ var waigo = require('waigo'),
 
 
 var logSchema = schema.create({
-  job: String,
+  job: { type: mongoose.Schema.Types.ObjectId, ref: 'Job' },
   trigger: { type: mongoose.Schema.Types.ObjectId, ref: 'Trigger' },
   text: String,
   meta: { type: mongoose.Schema.Types.Mixed },

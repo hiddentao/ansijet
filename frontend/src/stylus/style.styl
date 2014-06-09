@@ -102,6 +102,11 @@ form
     &:after
       content ': '
       bold()
+  .help
+    notice()
+    font-size 80%
+    margin 0.3em
+    italic()
   input[type=text]
     input(pal4)
   input[type=submit]
@@ -109,6 +114,10 @@ form
 
 a.btn
   button(pal4)
+
+  &.delete
+    button(pal1)
+    color #fff
 
 table
   table(false, true, false)
@@ -131,8 +140,6 @@ table
 
     span.qryStringSpacer:last-child
       display: none;
-
-
 
 
 .info
@@ -177,4 +184,5 @@ div.expandable
 
 @import "./_dashboard"
 @import "./_playbooks"
-@import "./_logs"
+@import "./_triggers"
+@import "./_playbooks"

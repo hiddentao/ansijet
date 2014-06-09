@@ -18,6 +18,15 @@ $.ready(function() {
       collapsed.style.display = 'block';
     };
   });
+
+
+  // delete buttons
+  $('a.delete').on('?click', function(e) {
+    var elem = this[0];
+    var str = elem.getAttribute('data-item-type') || 'item';
+
+    return confirm('Are you sure you want to delete this ' + str + '?');
+  })
   
 });
 

@@ -1,60 +1,49 @@
 var _ = require('lodash'),
   https = require('https'),
-  URL = require('url');
+  URL = require('url'),
+  util = require('util');
 
 
 var waigo = require('waigo'),
-  Form = waigo.load('support/forms/form').Form;
+  TriggerType = waigo.load('support/triggerType');
+
+
+
+var Shippable = module.exports = function() {};
+util.inherits(Shippable, TriggerType);
 
 
 
 /**
- * Construct parameter form.
- *
- * The parameter form is presented to the user when creating a trigger and 
- * consists of a list of parameters for which the user is required to set a 
- * value. These parameters are specific to a `Trigger` and are necessary for 
- * this trigger type to work.
- * 
- * @return {Form}
+ * @override
  */
-exports.getParamsForm = function*() {
-  return new Form({
-    fields: [
-      {
-        name: 'projectId',
-        type: 'text',
-        label: 'Shippable Project Id',
-        sanitizers: [ 'trim' ],
-        validators: [ 'notEmpty' ],
-      },
-      {
-        name: 'branch',
-        type: 'text',
-        label: 'Branch to deploy',
-        sanitizers: [ 'trim' ],
-        validators: [ 'notEmpty' ]
-      }
-    ]
-  });
+Shippable.prototype.ansibleVariables = function() {
+  return {
+    shippable_project_id: {
+      type: 'config',
+      desc: 'The project id in Shippable'
+    },
+    shippable_expected_branch: {
+      type: 'config',
+      desc: 'The branch to deploy'
+    },
+    shippable_build_artifacts_url: {
+      type: 'generated',
+      desc: 'URL to deployable build artifacts zipfile'
+    },
+    shippable_build_num: {
+      type: 'query',
+      desc: 'The build number',
+      value: '$BUILD_NUMBER'
+    },
+    shippable_build_branch: {
+      type: 'query',
+      desc: 'The git branch which got built',
+      value: '$BRANCH'
+    }    
+  };
 };
 
-
-
-
-/**
- * Expected URL parameters for this trigger type.
- */
-exports.urlParams = {
-  build_num: {
-    desc: 'Shippable build number',
-    value: '$BUILD_NUMBER'
-  },
-  branch: {
-    desc: 'Git branch which got built',
-    value: '$BRANCH'
-  }
-};
 
 
 
@@ -67,28 +56,25 @@ exports.urlParams = {
  * - That the build id is of the latest build for this project
  * - That the branch is 'master'
  *
- * @param {Object} queryParams The request query params.
- * @param {Object} triggerParams The trigger config params (see getParamsForm()).
- *
- * @return {Object} Ansible build variables.
- * 
- * @throws Error If any errors occur.
+ * @override
  */
-exports.process = function*(queryParams, triggerParams) {
-  params = _.extend({}, params);
+Shippable.prototype.process = function*(configParams, queryParams) {
+  queryParams = _.extend({}, queryParams);
 
-  if (triggerParams.branch !== params.branch) {
-    throw new Error('Can only build ' + triggerParams.branch + ' branch');    
+  if (configParams.shippable_expected_branch !== queryParams.shippable_build_branch) {
+    throw new Error('Can only build ' + triggerParams.shippable_expected_branch + ' branch');    
   }
 
-  var artifactsUrl = 'https://api.shippable.com/projects/' + triggerParams.projectId + '/builds/' + params.build_num + '/artifacts';
+  var artifactsUrl = 'https://api.shippable.com/projects/' + configParams.shippable_project_id + '/builds/' + queryParams.shippable_build_num + '/artifacts';
   
   return {
-    shippable_project_id: trigger.projectId,
-    shippable_build_branch: triggerParams.branch,
-    shippable_build_num: params.build_num,
+    shippable_project_id: configParams.shippable_project_id,
+    shippable_expected_branch: configParams.shippable_expected_branch,
+    shippable_build_branch: queryParams.shippable_build_branch,
+    shippable_build_num: params.shippable_build_num,
     shippable_build_artifacts_url: artifactsUrl,
   };
 };
+
 
 

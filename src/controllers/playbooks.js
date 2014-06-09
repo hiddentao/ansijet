@@ -85,7 +85,7 @@ exports.addTrigger_submitStep1 = function*() {
     // put state into session and show next form
     this.session.createTriggerFormState = addTriggerForm.state;
 
-    this.response.redirect(this.playbook.settingsUrl + '/addTrigger/step2')
+    this.response.redirect(this.playbook.viewUrl + '/addTrigger/step2')
   } catch (err) {
     this.response.status = 400;
 
@@ -110,9 +110,9 @@ exports.addTrigger_getStep2 = function*() {
   var addTriggerForm = Form.new('addTrigger');
   addTriggerForm.state = this.session.createTriggerFormState;
 
-  var triggerType = addTriggerForm.fields.type.value,
-    paramsForm = yield this.app.triggerTypes[triggerType].getParamsForm();
+  var triggerType = new this.app.triggerTypes[addTriggerForm.fields.type.value];
 
+  var paramsForm = triggerType.getConfigParamsForm();
 
   // show its form
   yield this.render('playbooks/addTriggerStep2', yield _vars(this, {
@@ -133,8 +133,9 @@ exports.addTrigger_submitStep2 = function*() {
   var addTriggerForm = Form.new('addTrigger');
   addTriggerForm.state = this.session.createTriggerFormState;
 
-  var triggerType = addTriggerForm.fields.type.value,
-    paramsForm = yield this.app.triggerTypes[triggerType].getParamsForm();
+  var triggerType = new this.app.triggerTypes[addTriggerForm.fields.type.value];
+
+  var paramsForm = triggerType.getConfigParamsForm();
 
   try {
     // validate
@@ -152,7 +153,7 @@ exports.addTrigger_submitStep2 = function*() {
       playbook: this.playbook._id,
       description: addTriggerForm.fields.description.value,
       type: addTriggerForm.fields.type.value,
-      params: paramKeyValues
+      configParams: paramKeyValues
     });
 
     yield thunkify(trigger.save).call(trigger);
@@ -160,7 +161,7 @@ exports.addTrigger_submitStep2 = function*() {
     // clear saved session var
     delete this.session.createTriggerFormState;
 
-    this.response.redirect(this.playbook.settingsUrl);
+    this.response.redirect(this.playbook.viewUrl);
   } catch (err) {
     this.response.status = 400;
 

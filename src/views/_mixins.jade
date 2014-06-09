@@ -13,7 +13,7 @@ mixin renderUrlTemplate(urlTemplate)
 
 
 
-mixin renderLogTable(logs, hideTriggerColumn)
+mixin renderLogTable(logs, hideTriggerColumn, hideJobColumn)
   if 0 < logs.length
     table.logs
       thead
@@ -22,7 +22,9 @@ mixin renderLogTable(logs, hideTriggerColumn)
         if !hideTriggerColumn
           th.trigger Trigger
 
-        th.job Job
+        if !hideJobColumn
+          th.job Job
+
         th.text Text
       - each log in logs
         tr
@@ -30,10 +32,12 @@ mixin renderLogTable(logs, hideTriggerColumn)
 
           if !hideTriggerColumn
             - var triggerName = log.trigger.description || log.trigger;
-            td(title="View trigger") 
-              a(href="/triggers/" + (log.trigger._id || log.trigger)) #{triggerName}
+            td 
+              a(title="View trigger", href="/triggers/" + (log.trigger._id || log.trigger)) #{triggerName}
 
-          td #{log.job}
+          if !hideJobColumn
+            td 
+              a(title="View job", href="/jobs/" + log.job._id) #{log.job._id}
 
           - var textTdClass = (log.meta && log.meta.console ? 'console': '')
           td(class="text " + textTdClass)
@@ -45,6 +49,31 @@ mixin renderLogTable(logs, hideTriggerColumn)
                 +renderExpandableChunk(log.text)
   else
     em No logs found
+
+
+
+mixin renderJobTable(logs)
+  if 0 < jobs.length
+    table.jobs
+      thead
+        th.time Time
+        th.job Job
+        th.source Source
+        th.params Params
+        th.result Result
+      - each log in logs
+        tr
+          td #{prettyPrintTimestamp(job.created_at)}
+          td
+            a(href="/jobs/" + job._id) #{job._id}
+          td #{job.source}
+          td
+            pre #{JSON.stringify(job.params)}
+          td
+            - var resultClass = ('success' === job.result ? 'success': 'error')
+            span(class=resultClass) #{job.result}
+  else
+    em No jobs found
 
 
 
@@ -90,6 +119,9 @@ mixin form(form, submitBtnText)
           select(name=field.name, value=field.value)
             - each label, val in field.options
                 option(value=val) #{label}
+
+        if field.helpText
+          .help #{field.helpText}
 
         if fieldErrors[fieldName]
           - each errorMeta, errorId in fieldErrors[fieldName].errors

@@ -4,31 +4,24 @@ include ./_mixins
 
 extends layout
 
-
 block content
 
   #dashboard
 
-    .triggers
-      h1 Active triggers
-      table
-        thead
-          th Description
-          th Playbook
-          th Type
-        - each trigger in triggers
-          tr
-            td #{trigger.description}
-            td 
-              if trigger.playbook
-                a(href=trigger.playbook.settingsUrl) #{trigger.playbook.name}
-            td #{trigger.type}
-            td 
-              a(href="/triggers/" + trigger._id) more &raquo;
-
-    .logs
-      h2
-        span Recent logs
-        a.subtitle(href="/logs") View all
-
-      +renderLogTable(logs)
+    .jobs
+      h1 Active Jobs
+      if 0 < jobs.length
+        table.jobs
+          thead
+            th Started
+            th Job
+            th Trigger
+          - each job in jobs
+            tr
+              td #{prettyPrintDate(job.created_at)}
+              td
+                a(href=job.viewUrl) #{job._id}
+              td
+                a(href=trigger.viewUrl) #{trigger.description}
+      else
+        em No active jobs

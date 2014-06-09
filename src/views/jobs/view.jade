@@ -6,25 +6,20 @@ extends ../layout
 
 block content
 
-  #trigger
+  #job
 
-    h1 Trigger: #{trigger.description}
-
-    .actions
-      a.btn.delete(href="?_method=DELETE", data-item-type="trigger") Delete
+    h1 Job: #{job._id}
 
     .info
-      .playbook
-        span.label Playbook
+      .trigger
+        span.label Trigger
         span
-          a(href=trigger.playbook.viewUrl) #{trigger.playbook.name}
-      .type
-        span.label Type
-        span #{trigger.type}
+          a(href=trigger.viewUrl) #{job.trigger.name}
+
       .url
         span.label Request URL
         span
-          +renderUrlTemplate(trigger.invokeUrlTemplate)
+          +renderUrlTemplate(trigger.urlTemplate)
       if !_.isEmpty(trigger.ansibleVars)
       .ansibleVars
         span.label Ansible variables
@@ -39,7 +34,7 @@ block content
               td 
                 case meta.type
                   when 'config'
-                    code #{meta.value}
+                    span #{meta.value}
                   when 'query'
                     em Obtained from request
                   when 'generated'
@@ -49,6 +44,6 @@ block content
 
 
 
-    h2 Recent jobs (latest #{jobs.length})
+    h2 Logs
 
-    +renderJobTable(jobs)
+    +renderLogTable(logs, true, true)

@@ -21,7 +21,7 @@ var playbookSchema = schema.create({
 
 
 
-playbookSchema.virtual('settingsUrl').get(function() {
+playbookSchema.virtual('viewUrl').get(function() {
   return '/playbooks/' + this.name;
 });
 
@@ -43,7 +43,7 @@ playbookSchema.method('getCode', function*() {
  * @override
  */
 playbookSchema.method('viewObjectKeys', function(ctx) {
-  return ['_id', 'name', 'path', 'settingsUrl'];
+  return ['_id', 'name', 'path', 'viewUrl'];
 });
 
 

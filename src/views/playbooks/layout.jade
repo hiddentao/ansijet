@@ -9,7 +9,7 @@ block content
         - each playbook in playbooks
           - var liClass = (selectedPlaybookId == playbook.name) ? 'active': ''
           li(class=liClass)
-            a(href=playbook.settingsUrl) #{playbook.name}
+            a(href=playbook.viewUrl) #{playbook.name}
 
     .content
       block subContent1

@@ -6,6 +6,21 @@ var path = require('path'),
 
 
 module.exports = function(config) {
+  // ------------- BEGIN EDITING --------------- //
+
+
+  /** Path to Python installation site-packages folder */
+  config.pythonSitePackages = '/usr/local/lib/python2.7/site-packages';
+
+  /** Pat to Ansible source code (cloned from git repo) */
+  config.ansibleSource = '/Users/home/dev/ansible/ansible';
+
+  /** Path to Ansible playbooks */
+  config.ansiblePlaybooks = path.join(__dirname, '..', '..', 'ansible', 'ansible');
+
+
+  // ------------- STOP EDITING --------------- //
+
   waigo.load('waigo:config/base')(config);
 
   config.db = {
@@ -19,6 +34,7 @@ module.exports = function(config) {
   config.middleware.order = [
     'errorHandler',
     'staticResources',
+    'methodOverride',
     'outputFormats',
     'sessions'
   ];
@@ -39,14 +55,6 @@ module.exports = function(config) {
   config.middleware.options.staticResources = {
     folder: '../frontend/build'
   };
-
-  /* Set the following values according to your system */
-
-  config.pythonSitePackages = '/usr/local/lib/python2.7/site-packages';
-
-  config.ansibleSource = '/Users/home/dev/ansible/ansible';
-
-  config.ansiblePlaybooks = path.join(__dirname, '..', '..', 'ansible', 'ansible');
 };
 
 
