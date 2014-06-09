@@ -10,6 +10,7 @@ var stylus = require('gulp-stylus');
 var minifyCSS = require('gulp-minify-css');
 var uglify = require('gulp-uglify');
 var gzip = require('gulp-gzip');
+var expect = require('gulp-expect-file');
 
 
 
@@ -19,11 +20,12 @@ var paths = {
   cssSrcFiles: './frontend/src/stylus/style.styl',
   cssSrcFilesWatch: './frontend/src/stylus/*.styl',
 
-  // jsSrcFiles: [
-  //   './frontend/src/js/**/*.js',
-  //   './frontend/src/bower_components/**/*.js',
-  // ],
-  // jsBuildFolder: './frontend/build/js',
+  jsSrcFiles: [
+    './frontend/src/bower/minified/dist/minified-web-src.js',
+    './frontend/src/js/**/*.js',
+  ],
+  jsSrcFilesWatch: './frontend/src/js/**/*.js',
+  jsBuildFolder: './frontend/build/js',
 };
 
 
@@ -56,28 +58,49 @@ gulp.task('css', function () {
 
 
 
-// gulp.task('js', function() {
-//   return gulp.src( paths.jsSrcFiles )
-//     .pipe( concat() )
-//     .pipe( uglify() )
-//     .pipe( gulp.dest(paths.jsBuildFolder) )
-//     .pipe( gzip({ gzipOptions: { level: 9 } }) ) 
-//     .pipe( gulp.dest(paths.jsBuildFolder) )
-//     ;
-// })
+gulp.task('js', function() {
+  return gulp.src( paths.jsSrcFiles )
+    .pipe( concat('all.js') )
+    .pipe( uglify() )
+    .pipe( gulp.dest(paths.jsBuildFolder) )
+    .pipe( gzip({ gzipOptions: { level: 9 } }) ) 
+    .pipe( gulp.dest(paths.jsBuildFolder) )
+    ;
+})
 
 
 
 // Rerun the task when a file changes
-gulp.task('watch', ['css'], function() {
+gulp.task('watch', ['css', 'js'], function() {
   gulp.watch(paths.cssSrcFilesWatch, ['css']); // watch the same files in our scripts task
-  // gulp.watch(paths.jsSrcFiles, ['js']); // watch the same files in our scripts task
+  gulp.watch(paths.jsSrcFilesWatch, ['js']); // watch the same files in our scripts task
 });
 
 
 
+gulp.task('build', ['clean', 'css', 'js']);
+
+
+gulp.task('verify_build', function() {
+  return gulp.src(
+      [].concat(
+        path.join(paths.cssBuildFolder, '**', '*.*'),
+        path.join(paths.jsBuildFolder, '**', '*.*')
+      )
+    )
+    .pipe( expect([
+      'frontend/build/css/style.css',
+      'frontend/build/css/style.css.gz',
+      'frontend/build/js/all.js',
+      'frontend/build/js/all.js.gz',
+    ]) )
+  ;
+})
+
+
+
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['clean', 'css', 'js']);
+gulp.task('default', ['build']);
 
 
 

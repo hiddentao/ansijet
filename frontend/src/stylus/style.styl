@@ -150,10 +150,19 @@ div.expandable
   position relative
   cursor pointer
 
+  .expanded
+    display none
+
   & > div
     padding 0.2em
-    border 1px solid #ccc
-    border-radius(2px)
+
+    &.collapsed
+      border 1px solid #ccc
+      border-radius(2px)
+
+    &.expanded
+      display none
+      border-radius none
 
   span.indicator
     display inline-block

@@ -1,0 +1,28 @@
+{
+  "name": "ansibot",
+  "version": "1.0.0",
+  "homepage": "https://github.com/hiddentao/ansibot",
+  "authors": [
+    "Ramesh Nair <ram@hiddentao.com>"
+  ],
+  "description": "Ansible automation server",
+  "keywords": [
+    "ansible",
+    "rest",
+    "web",
+    "ui",
+    "api"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "minified": "~2014.0.0-beta5.0"
+  }
+}

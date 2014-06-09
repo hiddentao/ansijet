@@ -4,3 +4,4 @@ $HOME
 ansible
 npm-debug.log
 frontend/build
+frontend/src/bower

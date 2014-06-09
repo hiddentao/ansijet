@@ -49,9 +49,6 @@ mixin renderLogTable(logs, hideTriggerColumn)
 
 
 mixin renderExpandableChunk(text, isCode)
-  - var showNext = "if (!nextSibling) return; this.nextSibling.style.display = 'block'; this.style.display = 'none'";
-  - var showPrev = "if (!previousSibling) return; this.previousSibling.style.display = 'block'; this.style.display = 'none'";
-
   - text = text || ''
   - var preview = text.substr(0, 100)
   - var tooLong = preview.length < text.length
@@ -59,16 +56,16 @@ mixin renderExpandableChunk(text, isCode)
   div(class=(tooLong ? 'expandable': ''))
     if isCode
       if tooLong
-        pre(onclick=showNext) #{preview}
+        pre.collapsed #{preview}
           span.indicator Click to expand
-        pre(onclick=showPrev, style="display:none") #{text}
+        pre.expanded #{text}
       else
         pre #{text}
     else
       if tooLong
-        div(onclick=showNext) #{preview}
+        div.collapsed #{preview}
           span.indicator Click to expand
-        div(onclick=showPrev, style="display:none") #{text}
+        div.expanded #{text}
       else
         div #{text}
 
