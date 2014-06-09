@@ -1,5 +1,6 @@
 doctype html
 html
+  block vars
   head
     title #{pageTitle}
     link(rel="stylesheet", media="all", href="/css/style.css")
@@ -8,15 +9,16 @@ html
       a.brand(href="/", title="Dashboard homepage") Ansibot      
       nav
         ul
-          li
+          li(class=('playbooks' === selectedNav ? 'active': ''))
             a(href="/playbooks", title="View playbooks") Playbooks
-          li
+
+          li(class=('triggers' === selectedNav ? 'active': ''))
             a(href="/triggers", title="View triggers") Triggers
-          li
+
+          li(class=('logs' === selectedNav ? 'active': ''))
             a(href="/logs", title="View logs") Logs
 
     main
       block content
-
 
     script(type="text/javascript", src="/js/all.js")
