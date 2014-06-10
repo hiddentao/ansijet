@@ -68,6 +68,10 @@ Shippable.prototype.process = function*(configParams, queryParams) {
   }
 
   var artifactsUrl = 'https://api.shippable.com/projects/' + configParams.shippable_project_id + '/builds/' + queryParams.shippable_build_num + '/artifacts';
+
+  // TODO: check that artifacts exist!
+  
+  // TODO: check that build number is incremental!
   
   return {
     shippable_project_id: configParams.shippable_project_id,

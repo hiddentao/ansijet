@@ -70,7 +70,7 @@ jobSchema.method('execute', function*() {
 
     // build final command
     var cmd = [ 
-      path.join(app.config.ansibleSource, 'bin', 'ansible-playbook'),
+      app.config.ansiblePlaybookBin,
       '-v',
       '-i ' + path.join(app.config.ansiblePlaybooks, 'hosts'),
       '--extra-vars=' + extraVars.join(','),
@@ -81,14 +81,7 @@ jobSchema.method('execute', function*() {
 
     // execute
     var result = yield exec(cmd, {
-      outputTimeout: 60,
-      env: {
-        'ANSIBLE_LIBRARY': path.join(app.config.ansibleSource, 'library'),
-        'PYTHONPATH': [
-          path.join(app.config.ansibleSource, 'lib'),
-          app.config.pythonSitePackages
-        ].join(':')
-      }
+      outputTimeout: 60
     });
 
     yield this.log(result.stdout, { console: true });

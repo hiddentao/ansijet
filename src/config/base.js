@@ -8,15 +8,11 @@ var path = require('path'),
 module.exports = function(config) {
   // ------------- BEGIN EDITING --------------- //
 
-
-  /** Path to Python installation site-packages folder */
-  config.pythonSitePackages = '/usr/local/lib/python2.7/site-packages';
-
-  /** Pat to Ansible source code (cloned from git repo) */
-  config.ansibleSource = '/Users/home/dev/ansible/ansible';
+  /** Pat to Ansible binary */
+  config.ansiblePlaybookBin = '/usr/local/bin/ansible-playbook';
 
   /** Path to Ansible playbooks */
-  config.ansiblePlaybooks = path.join(__dirname, '..', '..', 'ansible', 'ansible');
+  config.ansiblePlaybooks = path.join(__dirname, '..', '..', 'ansible', 'playbooks');
 
   /** Max no. of jobs to execute in parallel */
   config.jobsInParallel = 2;
