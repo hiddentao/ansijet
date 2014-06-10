@@ -78,7 +78,7 @@ gulp.task('watch', ['css', 'js'], function() {
 
 
 
-gulp.task('build', ['clean', 'css', 'js']);
+gulp.task('build', ['css', 'js']);
 
 
 gulp.task('verify_build', function() {

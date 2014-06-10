@@ -60,7 +60,7 @@ jobSchema.method('execute', function*() {
     var buildVariables = 
       yield triggerType.process(this.trigger.configParams, this.queryParams);
 
-    yield this.log('Ansible variables: ' + JSON.stringify(buildVariables), { console: true });
+    yield this.log('Ansible variables: ' + JSON.stringify(buildVariables), { code: true });
 
     // build --extra-vars parameter string
     var extraVars = [];

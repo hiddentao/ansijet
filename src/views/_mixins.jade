@@ -41,7 +41,7 @@ mixin renderLogTable(logs, hideTriggerColumn, hideJobColumn)
 
           - var textTdClass = (log.meta && log.meta.console ? 'console': '')
           td(class="text " + textTdClass)
-            if log.meta && (log.meta.console || log.meta.error)
+            if log.meta && (log.meta.console || log.meta.code || log.meta.error)
               - var preClass = log.meta.error ? 'error': ''
               +renderExpandableChunk(log.text, true, preClass)
             else
