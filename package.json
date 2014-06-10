@@ -32,7 +32,9 @@
     "lodash": "~2.4.1",
     "bluebird": "~2.0.2",
     "moment": "~2.6.0",
-    "waigo-method-override": "~1.0.0"
+    "waigo-method-override": "~1.0.0",
+    "co": "~3.0.6",
+    "waigo": "~1.4.0"
   },
   "devDependencies": {
     "nib": "~1.0.2",
@@ -42,6 +44,8 @@
     "gulp-uglify": "~0.3.0",
     "gulp-gzip": "0.0.8",
     "gulp-expect-file": "0.0.6",
-    "gulp-debug": "~0.3.0"
+    "gulp-debug": "~0.3.0",
+    "gulp": "~3.8.0",
+    "gulp-stylus": "~1.0.2"
   }
 }
