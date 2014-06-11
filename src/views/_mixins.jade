@@ -39,13 +39,13 @@ mixin renderLogTable(logs, hideTriggerColumn, hideJobColumn)
             td 
               a(title="View job", href=log.job.viewUrl) #{log.job._id}
 
-          - var textTdClass = (log.meta && log.meta.console ? 'console': '')
-          td(class="text " + textTdClass)
-            if log.meta && (log.meta.console || log.meta.code || log.meta.error)
-              - var preClass = log.meta.error ? 'error': ''
-              +renderExpandableChunk(log.text, true, preClass)
+          - var textTdClass = (log.meta && log.meta.console ? 'console ': '')
+          - var errorClass = (log.meta && log.meta.error ? 'error ': '')
+          td(class="text " + textTdClass + errorClass)
+            if log.meta && (log.meta.console || log.meta.code)
+              +renderExpandableChunk(log.text, true, errorClass)
             else
-              +renderExpandableChunk(log.text)
+              +renderExpandableChunk(log.text, false, errorClass)
 
             // additional data
             if log.meta && log.meta.data

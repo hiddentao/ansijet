@@ -16,15 +16,19 @@ var expect = require('gulp-expect-file');
 
 var paths = {
   buildFolder: './frontend/build',
-  cssBuildFolder: './frontend/build/css',
-  cssSrcFiles: './frontend/src/stylus/style.styl',
-  cssSrcFilesWatch: './frontend/src/stylus/*.styl',
 
-  jsSrcFiles: [
+  stylusSrcFiles: './frontend/src/stylus/style.styl',
+  stylusSrcFilesWatch: './frontend/src/stylus/*.styl',
+  cssBuildFolder: './frontend/build/css',
+
+  jsHeadFiles: [
+    './frontend/src/bower/pace/pace.js',
+  ],
+  jsAppFiles: [
     './frontend/src/bower/minified/dist/minified-web-src.js',
     './frontend/src/js/**/*.js',
   ],
-  jsSrcFilesWatch: './frontend/src/js/**/*.js',
+  jsAppFilesWatch: './frontend/src/js/**/*.js',
   jsBuildFolder: './frontend/build/js',
 };
 
@@ -41,7 +45,7 @@ gulp.task('clean', function() {
 
 
 gulp.task('css', function () {
-  return gulp.src( paths.cssSrcFiles )
+  return gulp.src( paths.stylusSrcFiles )
     .pipe( stylus({
       use: [ nib() ],
       errors: true
@@ -59,8 +63,8 @@ gulp.task('css', function () {
 
 
 gulp.task('js', function() {
-  return gulp.src( paths.jsSrcFiles )
-    .pipe( concat('all.js') )
+  return gulp.src( paths.jsAppFiles )
+    .pipe( concat('app.js') )
     .pipe( uglify() )
     .pipe( gulp.dest(paths.jsBuildFolder) )
     .pipe( gzip({ gzipOptions: { level: 9 } }) ) 
@@ -70,10 +74,11 @@ gulp.task('js', function() {
 
 
 
+
 // Rerun the task when a file changes
 gulp.task('watch', ['css', 'js'], function() {
-  gulp.watch(paths.cssSrcFilesWatch, ['css']); // watch the same files in our scripts task
-  gulp.watch(paths.jsSrcFilesWatch, ['js']); // watch the same files in our scripts task
+  gulp.watch(paths.stylusSrcFilesWatch, ['css']); // watch the same files in our scripts task
+  gulp.watch(paths.jsAppFilesWatch, ['js']); // watch the same files in our scripts task
 });
 
 
@@ -91,8 +96,8 @@ gulp.task('verify_build', function() {
     .pipe( expect([
       'frontend/build/css/style.css',
       'frontend/build/css/style.css.gz',
-      'frontend/build/js/all.js',
-      'frontend/build/js/all.js.gz',
+      'frontend/build/js/app.js',
+      'frontend/build/js/app.js.gz',
     ]) )
   ;
 })

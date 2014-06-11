@@ -10,9 +10,13 @@ table.logs
   td.text
     word-wrap break-word
 
-    &.console pre
-      background-color #000
-      color #fff
+    &.console, &.code
+      pre
+        background-color pal1
+        color #fff
+
+      .error
+        flash(type: error)
 
 
 table.jobs

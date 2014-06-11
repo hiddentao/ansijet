@@ -77,6 +77,9 @@ main
 forms()
 code-blocks()
 
+a
+  link(color: pal3)
+
 pre
   margin 0
 
@@ -95,6 +98,12 @@ h2
   margin-top 2em
 
 form
+  .error 
+    border 1px solid pal3
+    background-color lighten(pal3, 80%)
+    color pal3
+    border-radius(5px)
+    padding 10px
   .field
     margin 2em 0
     .error
@@ -112,20 +121,13 @@ form
   input[type=text]
     input(pal4)
   input[type=submit]
-    button(pal4)
+    btn()
 
 a.btn
-  button(pal4)
-
-  &.delete
-    button(pal1)
-    color #fff
+  btn()
 
 table
   table(false, true, false)
-
-.error 
-  flash(type=error)
 
 .urlTemplate
   font-family monospace
@@ -178,8 +180,9 @@ div.expandable
     position absolute
     top 0px
     right 0px
-    background-color pal5
-    color #fff
+    border 1px solid pal2
+    background-color pal2
+    color pal5
     padding 0.2em
 
 
