@@ -87,7 +87,7 @@ TriggerType.prototype.getQueryParams = function() {
  * @param {Object} configParams The config params (see `getConfigParamsForm`).
  * @param {Object} queryParams The request query params.
  *
- * @return {Object} Ansible variables with values (see `ansibleVariables`).
+ * @return {Object} {proceedWithBuild: Boolean, msg:String, ansibleVars:Object).
  * 
  * @throws Error If any errors occur.
  */

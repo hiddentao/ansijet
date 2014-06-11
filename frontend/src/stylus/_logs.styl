@@ -1,27 +1,31 @@
-table.logs
-  thead 
-    th.time
-      width 12%
-    th.trigger
-      max-width 10%
-      width 10%
-    th.job
-      width 10%
-  td.text
-    word-wrap break-word
+.logs
+  table.list
+    thead 
+      th.time
+        width 12%
+      th.trigger
+        max-width 10%
+        width 10%
+      th.job
+        width 10%
+    td.text
+      word-wrap break-word
 
-    &.console, &.code
-      pre
-        background-color pal1
-        color #fff
+      &.console, &.code
+        pre
+          background-color pal1
+          color #fff
 
       .error
         flash(type: error)
 
+      .warning
+        flash(type: warning)
 
-table.jobs
-  td.status
-    span
-      display inline-block
+  .jobs     
+    table.list
+      td.status
+        span
+          display inline-block
 
-      
+        

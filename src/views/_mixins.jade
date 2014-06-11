@@ -15,41 +15,43 @@ mixin renderUrlTemplate(urlTemplate)
 
 mixin renderLogTable(logs, hideTriggerColumn, hideJobColumn)
   if 0 < logs.length
-    table.logs
-      thead
-        th.time Time
-
-        if !hideTriggerColumn
-          th.trigger Trigger
-
-        if !hideJobColumn
-          th.job Job
-
-        th.text Text
-      - each log in logs
-        tr
-          td #{prettyPrintTimestamp(log.created_at)}
+    .logs
+      table.list
+        thead
+          th.time Time
 
           if !hideTriggerColumn
-            - var triggerName = log.trigger.description || log.trigger;
-            td 
-              a(title="View trigger", href="/triggers/" + (log.trigger._id || log.trigger)) #{triggerName}
+            th.trigger Trigger
 
           if !hideJobColumn
-            td 
-              a(title="View job", href=log.job.viewUrl) #{log.job._id}
+            th.job Job
 
-          - var textTdClass = (log.meta && log.meta.console ? 'console ': '')
-          - var errorClass = (log.meta && log.meta.error ? 'error ': '')
-          td(class="text " + textTdClass + errorClass)
-            if log.meta && (log.meta.console || log.meta.code)
-              +renderExpandableChunk(log.text, true, errorClass)
-            else
-              +renderExpandableChunk(log.text, false, errorClass)
+          th.text Text
+        - each log in logs
+          tr
+            td.time #{prettyPrintTimestamp(log.created_at)}
 
-            // additional data
-            if log.meta && log.meta.data
-              code #{JSON.stringify(log.meta.data)}
+            if !hideTriggerColumn
+              - var triggerName = log.trigger.description || log.trigger;
+              td.trigger 
+                a(title="View trigger", href="/triggers/" + (log.trigger._id || log.trigger)) #{triggerName}
+
+            if !hideJobColumn
+              td.job 
+                a(title="View job", href=log.job.viewUrl) #{log.job._id}
+
+            - var textTdClass = (log.meta && log.meta.console ? 'console ': '')
+            - var errorClass = (log.meta && log.meta.error ? 'error ': '')
+            - var warningClass = (log.meta && log.meta.warning ? 'warning ': '')
+            td(class="text " + textTdClass)
+              if log.meta && (log.meta.console || log.meta.code)
+                +renderExpandableChunk(log.text, true, errorClass + warningClass)
+              else
+                +renderExpandableChunk(log.text, false, errorClass + warningClass)
+
+              // additional data
+              if log.meta && log.meta.data
+                code #{JSON.stringify(log.meta.data)}
 
   else
     em No logs found
@@ -58,27 +60,22 @@ mixin renderLogTable(logs, hideTriggerColumn, hideJobColumn)
 
 mixin renderJobTable(logs)
   if 0 < jobs.length
-    table.jobs
-      thead
-        th.job Job
-        th.time Time
-        th.source Source
-        th.params Params
-        th.status Status
-      - each job in jobs
-        tr
-          td
-            a(href=job.viewUrl) #{job._id}
-          td #{prettyPrintTimestamp(job.created_at)}
-          td #{job.source}
-          td
-            if !_.isEmpty(job.queryParams)
-              pre #{JSON.stringify(job.params)}
-            else
-              em -
-          td.status
-            - var resultClass = ('failed' === job.status ? 'error': '')
-            span(class=resultClass) #{job.status}
+    .jobs
+      table.list
+        thead
+          th.job Job
+          th.time Time
+          th.source Source
+          th.status Status
+        - each job in jobs
+          tr
+            td.job
+              a(href=job.viewUrl) #{job._id}
+            td.time #{prettyPrintTimestamp(job.created_at)}
+            td.source #{job.source}
+            td.status
+              - var resultClass = ('failed' === job.status ? 'error': '')
+              span(class=resultClass) #{job.status}
   else
     em No jobs found
 
@@ -97,14 +94,14 @@ mixin renderExpandableChunk(text, isCode, cssClasses)
           span.indicator Click to expand
         pre(class=cssClasses + ' expanded') #{text}
       else
-        pre #{text}
+        pre(class=cssClasses) #{text}
     else
       if tooLong
         div(class=cssClasses + ' collapsed') #{preview}
           span.indicator Click to expand
         div(class=cssClasses + ' expanded') #{text}
       else
-        div #{text}
+        div(class=cssClasses) #{text}
 
 
 

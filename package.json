@@ -34,7 +34,8 @@
     "moment": "~2.6.0",
     "waigo-method-override": "~1.0.0",
     "co": "~3.0.6",
-    "waigo": "~1.4.1"
+    "waigo": "~1.4.1",
+    "follow-redirects": "0.0.3"
   },
   "devDependencies": {
     "nib": "~1.0.2",

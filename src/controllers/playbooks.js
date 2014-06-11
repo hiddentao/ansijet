@@ -42,7 +42,9 @@ exports.loadPlaybook = function*(next) {
 
 
 exports.index = function*() {
-  yield this.render('playbooks/index', yield _vars(this));
+  yield this.render('playbooks/index', yield _vars(this, {
+    playbook_path: this.app.config.ansiblePlaybooks
+  }));
 };
 
 

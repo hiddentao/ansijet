@@ -32,7 +32,10 @@ Simple.prototype.ansibleVariables = function() {
  * @override
  */
 Simple.prototype.process = function*(configParams, queryParams) {
-  return {};
+  return {
+    proceed: true,
+    ansibleVars: {}
+  };
 };
 
 

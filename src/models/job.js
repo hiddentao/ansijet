@@ -57,39 +57,51 @@ jobSchema.method('execute', function*() {
     }
 
     // let trigger type perform its checks
-    var buildVariables = 
+    var processingResult = 
       yield triggerType.process(this.trigger.configParams, this.queryParams);
 
-    yield this.log('Ansible variables: ' + JSON.stringify(buildVariables), { code: true });
+    if (!processingResult.proceed) {
+      if (!processingResult.msg) {
+        throw new Error('Job procesing failed');
+      }
 
-    // build --extra-vars parameter string
-    var extraVars = [];
-    for (let key in buildVariables) {
-      extraVars.push(key + '=' + buildVariables[key]);
+      yield this.log('Job stopped: ' + processingResult.msg, { warning: true });
+
+      this.status = 'stopped';
+
+    } else {
+      var buildVariables = processingResult.ansibleVars || {};
+
+      yield this.log('Ansible variables: ' + JSON.stringify(buildVariables), { code: true });
+
+      // build --extra-vars parameter string
+      var extraVars = [];
+      for (let key in buildVariables) {
+        extraVars.push(key + '=' + buildVariables[key]);
+      }
+
+      // build final command
+      var cmd = [ 
+        app.config.ansiblePlaybookBin,
+        '-v',
+        '-i ' + path.join(app.config.ansiblePlaybooks, 'hosts'),
+        '--extra-vars=' + extraVars.join(','),
+        playbook.path
+      ].join(' ');
+
+      yield this.log(cmd, { console: true });
+
+      // execute
+      var result = yield exec(cmd, {
+        outputTimeout: 60
+      });
+
+      yield this.log(result.stdout, { console: true });
+
+      yield this.log('Job complete');
+
+      this.status = 'completed';
     }
-
-    // build final command
-    var cmd = [ 
-      app.config.ansiblePlaybookBin,
-      '-v',
-      '-i ' + path.join(app.config.ansiblePlaybooks, 'hosts'),
-      '--extra-vars=' + extraVars.join(','),
-      playbook.path
-    ].join(' ');
-
-    yield this.log(cmd, { console: true });
-
-    // execute
-    var result = yield exec(cmd, {
-      outputTimeout: 60
-    });
-
-    yield this.log(result.stdout, { console: true });
-
-    yield this.log('Job complete');
-
-    this.result = 'completed';
-
   } catch (err) {
     if (undefined !== err.code) {
       yield this.log('Exit code: ' + err.code + '\n\n' 
@@ -98,7 +110,7 @@ jobSchema.method('execute', function*() {
       yield this.log(err.message, { error: true });
     }
 
-    yield this.log('Job did not complete');
+    yield this.log('Job failed');
     this.status = 'failed';
   } finally {
     yield this._save();

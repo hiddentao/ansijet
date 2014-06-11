@@ -1,8 +1,26 @@
+include ../_mixins
+
 block vars
   - var pageTitle = 'Playbooks'
   - var selectedNav = 'playbooks'
 
-extends layout
+extends ../layout
 
-block subContent1
-  p Welcome to the playbook settings page. Select a playbook from the menu sidebar to edit its settings.
+block content
+
+  #playbooks
+
+    h1 Playbooks
+
+    p Playbooks are loaded from <strong>#{playbook_path}</strong>
+
+    if 0 < playbooks.length
+      table.playbooks
+        thead
+          th Name
+        - each playbook in playbooks
+          tr
+            td
+              a(href=playbook.viewUrl) #{playbook.name}
+    else
+      em No playbooks found

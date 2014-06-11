@@ -26,7 +26,6 @@ $.ready(function() {
     var str = elem.getAttribute('data-item-type') || 'item';
 
     return confirm('Are you sure you want to delete this ' + str + '?');
-  })
-  
+  });
 });
 

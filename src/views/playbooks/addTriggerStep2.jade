@@ -4,9 +4,12 @@ block vars
 
 include ../_mixins
 
-extends layout
+extends ../layout
 
-block subContent1
+block content
   h2 Set parameters for new trigger
 
+  if 1 > form.fields.length
+    em No parameters to set
+    
   +form(form, 'Submit')
