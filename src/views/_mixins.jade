@@ -51,7 +51,10 @@ mixin renderLogTable(logs, hideTriggerColumn, hideJobColumn)
 
               // additional data
               if log.meta && log.meta.data
-                code #{JSON.stringify(log.meta.data)}
+                ul.data
+                - each v,k in log.meta.data
+                  li
+                    code #{k}: #{v}
 
   else
     em No logs found
@@ -74,8 +77,8 @@ mixin renderJobTable(logs, showTrigger)
             td.job
               a(href=job.viewUrl) #{job._id}
             if showTrigger
-            td.trigger
-              a(href=job.trigger.viewUrl) #{job.trigger.description}
+              td.trigger
+                a(href=job.trigger.viewUrl) #{job.trigger.description}
             td.time #{prettyPrintTimestamp(job.created_at)}
             td.source #{job.source}
             td.status

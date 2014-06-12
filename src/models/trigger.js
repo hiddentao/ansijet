@@ -16,7 +16,7 @@ var triggerSchema = schema.create({
   type: String,
   playbook: { type: mongoose.Schema.Types.ObjectId, ref: 'Playbook' },
   configParams: { type: mongoose.Schema.Types.Mixed, default: {} },
-  token: String,
+  token: String,  /* authentication token */
   created_at: { type: Date, default: Date.now }
 });
 
@@ -26,6 +26,7 @@ triggerSchema.pre('save', function(next){
   if (!this.token) {
     this.token = (Math.random() + 1).toString(36).substr(2,11);
   }
+  next();
 });
 
 
@@ -40,7 +41,11 @@ triggerSchema.virtual('invokeUrlTemplate').get(function() {
 
   var urlParams = triggerType.getQueryParams();
   // add token to url params list
-  urlParams.token = this.token;
+  urlParams.token = {
+    type: 'query',
+    desc: 'Authentication token',
+    value: this.token
+  };
 
   return {
     path: '/invoke/' + this._id,
@@ -89,7 +94,7 @@ triggerSchema.virtual('ansibleVars').get(function() {
  * @override
  */
 triggerSchema.method('viewObjectKeys', function(ctx) {
-  return ['_id', 'description', 'type', 'playbook', 
+  return ['_id', 'description', 'type', 'playbook', 'token', 
   'configParams', 'ansibleVars', 'invokeUrlTemplate', 'viewUrl'];
 });
 

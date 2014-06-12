@@ -49,7 +49,7 @@ jobSchema.method('execute', function*() {
 
     // check token
     if (trigger.token != this.queryParams.token) {
-      throw new Error('Incorrect trigger token');
+      throw new Error('Incorrect auth token');
     }
 
     // trigger type
