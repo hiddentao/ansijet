@@ -7,9 +7,9 @@ include ../_mixins
 extends ../layout
 
 block content
-  h2 Set parameters for new trigger
+  h2 Set parameters for trigger
 
   if 1 > form.fields.length
-    em No parameters to set
+    em No parameters to set. Press Submit to continue.
     
   +form(form, 'Submit')

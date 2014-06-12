@@ -47,6 +47,11 @@ jobSchema.method('execute', function*() {
     // trigger
     var trigger = yield app.models.Trigger.getOne(this.trigger);
 
+    // check token
+    if (trigger.token != this.queryParams.token) {
+      throw new Error('Incorrect trigger token');
+    }
+
     // trigger type
     var triggerType = new app.triggerTypes[trigger.type];
 

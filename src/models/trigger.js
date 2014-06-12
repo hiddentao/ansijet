@@ -16,8 +16,18 @@ var triggerSchema = schema.create({
   type: String,
   playbook: { type: mongoose.Schema.Types.ObjectId, ref: 'Playbook' },
   configParams: { type: mongoose.Schema.Types.Mixed, default: {} },
+  token: String,
   created_at: { type: Date, default: Date.now }
 });
+
+
+
+triggerSchema.pre('save', function(next){
+  if (!this.token) {
+    this.token = (Math.random() + 1).toString(36).substr(2,11);
+  }
+});
+
 
 
 /**
@@ -29,6 +39,8 @@ triggerSchema.virtual('invokeUrlTemplate').get(function() {
   var triggerType = new app.triggerTypes[this.type]; 
 
   var urlParams = triggerType.getQueryParams();
+  // add token to url params list
+  urlParams.token = this.token;
 
   return {
     path: '/invoke/' + this._id,

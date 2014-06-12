@@ -26,6 +26,7 @@ Simple.prototype.ansibleVariables = function() {
 
 
 
+
 /**
  * Process given request.
  *
