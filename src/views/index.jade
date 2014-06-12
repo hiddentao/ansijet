@@ -12,18 +12,4 @@ block content
 
     .jobs
       h1 Active Jobs
-      if 0 < jobs.length
-        table.jobs
-          thead
-            th Started
-            th Job
-            th Trigger
-          - each job in jobs
-            tr
-              td #{prettyPrintTimestamp(job.created_at)}
-              td
-                a(href=job.viewUrl) #{job._id}
-              td
-                a(href=job.trigger.viewUrl) #{job.trigger.description}
-      else
-        em No active jobs
+      +renderJobTable(jobs, true)

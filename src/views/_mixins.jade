@@ -58,12 +58,14 @@ mixin renderLogTable(logs, hideTriggerColumn, hideJobColumn)
 
 
 
-mixin renderJobTable(logs)
+mixin renderJobTable(logs, showTrigger)
   if 0 < jobs.length
     .jobs
       table.list
         thead
           th.job Job
+          if showTrigger
+            th.trigger Trigger
           th.time Time
           th.source Source
           th.status Status
@@ -71,6 +73,9 @@ mixin renderJobTable(logs)
           tr
             td.job
               a(href=job.viewUrl) #{job._id}
+            if showTrigger
+            td.trigger
+              a(href=job.trigger.viewUrl) #{job.trigger.description}
             td.time #{prettyPrintTimestamp(job.created_at)}
             td.source #{job.source}
             td.status

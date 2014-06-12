@@ -159,6 +159,10 @@ jobSchema.method('viewObjectKeys', function(ctx) {
 
 /** 
  * Find active jobs.
+ *
+ * Returns jobs whose status is either 'created' or 'processing'. Jobs are 
+ * returned in reverse chronological order.
+ * 
  * @return {Promise} 
  */
 jobSchema.static('getActive', function() {
@@ -167,17 +171,6 @@ jobSchema.static('getActive', function() {
   }).sort({created_at: -1}).populate('trigger').exec();
 });
 
-
-
-/** 
- * Find pending jobs.
- * @return {Promise} 
- */
-jobSchema.static('getPending', function(limit) {
-  return this.find({
-    status: 'created'
-  }).sort({created_at: -1}).populate('trigger').limit(limit || 1000).exec();
-});
 
 
 

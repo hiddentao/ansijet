@@ -70,15 +70,18 @@ Shippable.prototype.process = function*(configParams, queryParams) {
     };
   }
 
+  /*
+  Build artefacts can no longer be accessed without auth so let's skip this 
+  section until https://github.com/Shippable/support/issues/205 is fixed.
+   */
   var artifactsUrl = 'https://api.shippable.com/projects/' + configParams.shippable_project_id + '/builds/' + queryParams.shippable_build_num + '/artifacts';
-
-  try {
-    yield urlUtils.check(artifactsUrl);
-  } catch (err) {
-    throw new Error('Build artifacts not found: ' + artifactsUrl);
-  }
-  
-  // TODO: check that build number is incremental!
+  // // check that artifacts can be accessed
+  // try {
+  //   yield urlUtils.check(artifactsUrl);
+  // } catch (err) {
+  //   throw new Error('Build artifacts not accessible: ' + artifactsUrl + ', ' + err.toString());
+  // }
+  // TODO check that this is the latest build
   
   return {
     proceed: true,
@@ -91,6 +94,8 @@ Shippable.prototype.process = function*(configParams, queryParams) {
     }
   };
 };
+
+
 
 
 
