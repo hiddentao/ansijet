@@ -8,14 +8,14 @@ var path = require('path'),
 module.exports = function(config) {
   // ------------- BEGIN EDITING --------------- //
 
-  /** Pat to Ansible binary */
+  /** Path to Ansible binary */
   config.ansiblePlaybookBin = '/usr/local/bin/ansible-playbook';
 
-  /** Path to Ansible playbooks */
+  /** Path to folder containg Ansible playbooks */
   config.ansiblePlaybooks = path.join(__dirname, '..', '..', 'ansible', 'playbooks');
 
-  /** Max no. of jobs to execute in parallel */
-  config.jobsInParallel = 2;
+  /** Max no. of jobs to execute in parallel. Should match no. of CPU cores. */
+  config.jobsInParallel = 1;
 
   // ------------- STOP EDITING --------------- //
 
