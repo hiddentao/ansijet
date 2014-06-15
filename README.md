@@ -62,12 +62,14 @@ within the same folder, i.e. at `<playbooks folder>/roles/`. Ditto for
 
 **Setup Ansibot**
 
+```bash
 $ git clone https://github.com/hiddentao/ansibot.git ansibot
 $ cd ansibot
 $ npm install
 $ bower install
 $ gulp build
 $ gulp verify_build
+```
 
 Now create `ansibot/src/config/production.js`:
 
@@ -91,8 +93,10 @@ override these too within the `config/production.js` you created.
 
 **Run Ansibot**
 
+```bash
 $ cd ansibot
 $ ./start-app.js
+```
 
 If you visit `http://localhost:3000` you should see the dashboard showing the 
 _Active Jobs_ (there should be none currently).
@@ -125,22 +129,22 @@ this fact in the back-end._
 
 At present two trigger types are supported:
 
-**Simple**
+**Trigger: Simple**
 
 This exposes a simple URL which triggers a playbook run. It does not 
 perform any checks prior to triggering the playbook run. Neither does it supply 
 any Ansible playbook variables.
 
-**Shippable**
+**Trigger: Shippable**
 
 This exposes a URL to be called after a successful [shippable.com](shippable.com) 
 CI build. It can be configured to with a Shippable project_id and a Git branch 
 to execute playbooks runs for. It supplies the following Ansible variables:
 
-  * `shippable_project_id`
-  * `shippable_expected_branch`  <- configured by user
-  * `shippable_build_num`
-  * `shippable_build_branch`     <- obtained from incoming request
+  * `shippable_project_id`        <- configured by user
+  * `shippable_expected_branch`   <- configured by user
+  * `shippable_build_num`         <- obtained from incoming request
+  * `shippable_build_branch`      <- obtained from incoming request
 
 _(Once [Shippable build artefacts](https://github.com/hiddentao/ansibot/issues/2) 
 are publicly accessible Ansibot will be able to supply the build artefacts URL 
