@@ -1,6 +1,7 @@
 {
   "name": "ansibot",
   "version": "1.0.0",
+  "private": true,
   "homepage": "https://github.com/hiddentao/ansibot",
   "authors": [
     "Ramesh Nair <ram@hiddentao.com>"
