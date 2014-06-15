@@ -17,6 +17,12 @@ module.exports = function(config) {
   /** Max no. of jobs to execute in parallel. Should match no. of CPU cores. */
   config.jobsInParallel = 1;
 
+  /** Output timeout (seconds). When running a Playbook job, 
+  if the shell process does not produce any output within this time period then 
+  the job is assumed to have frozen and will be terminated */
+  config.outputTimeout = 300;
+
+
   // ------------- STOP EDITING --------------- //
 
   waigo.load('waigo:config/base')(config);

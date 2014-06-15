@@ -98,7 +98,7 @@ jobSchema.method('execute', function*() {
 
       // execute
       var result = yield exec(cmd, {
-        outputTimeout: 60
+        outputTimeout: app.config.outputTimeout
       });
 
       yield this.log(result.stdout, { console: true });

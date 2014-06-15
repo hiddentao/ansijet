@@ -189,7 +189,8 @@ running playbooks which most probably affect your servers you will likely want t
 protect access to it.
 
 My setup is to have Ansibot placed behind an Nginx front-end 
-server, with SSL and HTTP Auth enforced and on all incoming requests.
+server, with SSL and HTTP Auth enforced and on all incoming requests. 
+
 
 ## Contributing
 
