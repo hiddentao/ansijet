@@ -35,7 +35,7 @@ earlier versions.
 
 _(For Ubuntu users I recommend the [Chris Lea PPA](https://launchpad.net/~chris-lea/+archive/node.js/))_.
 
-**Pre-requisite: MongoDB+**
+**Pre-requisite: MongoDB**
 
 Installation instructions: 
 
