@@ -148,7 +148,7 @@ to execute playbooks runs for. It supplies the following Ansible variables:
 
 _(Once [Shippable build artefacts](https://github.com/hiddentao/ansibot/issues/2) 
 are publicly accessible Ansibot will be able to supply the build artefacts URL 
-to playbooks).
+to playbooks)._
 
 
 ### Jobs
