@@ -88,7 +88,7 @@ jobSchema.method('execute', function*() {
       // build final command
       var cmd = [ 
         app.config.ansiblePlaybookBin,
-        '-v',
+        '-vv',
         '-i ' + path.join(app.config.ansiblePlaybooks, 'hosts'),
         '--extra-vars=' + extraVars.join(','),
         playbook.path

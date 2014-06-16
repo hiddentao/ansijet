@@ -19,7 +19,6 @@ var Exec = function(cmd, options) {
   var cmdArgs = cmd.split(' ');
   this._cmd = cmdArgs[0];
   this._args = cmdArgs.slice(1);
-  this._args.unshift('-vv');
   this._options = options || {};
 };
 

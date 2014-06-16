@@ -8,9 +8,6 @@ var path = require('path'),
 module.exports = function(config) {
   // ------------- BEGIN EDITING --------------- //
 
-  /** Path to Ansible binary */
-  config.ansiblePlaybookBin = '/usr/local/bin/ansible-playbook';
-
   /** Path to folder containg Ansible playbooks */
   config.ansiblePlaybooks = path.join(__dirname, '..', '..', 'ansible', 'playbooks');
 

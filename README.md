@@ -75,10 +75,6 @@ Now create `ansibot/src/config/production.js`:
 
 ```javascript
 module.exports = function(config) {
-
-  /** Path to Ansible binary */
-  config.ansiblePlaybookBin = '/usr/local/bin/ansible-playbook';
-
   /** Path to folder containg Ansible playbooks */
   config.ansiblePlaybooks = '/playbooks'
 

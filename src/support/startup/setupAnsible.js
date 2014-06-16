@@ -1,11 +1,14 @@
 "use strict";
 
 
-var debug = require('debug')('ansibot-startup-git-repo'),
+var _ = require('lodash'),
+  debug = require('debug')('ansibot-startup-ansible'),
   fs = require('then-fs'),
   path = require('path'),
   thunkify = require('thunkify'),
   waigo = require('waigo');
+
+var exec = waigo.load('support/exec-then');
 
 
 /**
@@ -14,6 +17,17 @@ var debug = require('debug')('ansibot-startup-git-repo'),
  * @param {Object} app The application.
  */
 module.exports = function*(app) {
+  debug('Finding ansible-playbook binary');
+
+  app.config.ansiblePlaybookBin = 
+    ((yield exec('which ansible-playbook')).stdout || '').trim();
+
+  if ('' === app.config.ansiblePlaybookBin) {
+    throw new Error('Unable to find ansible-playbook binary');
+  } else {
+    app.logger.info('Ansible playbook binary: ' + app.config.ansiblePlaybookBin);
+  }
+
   debug('Loading Ansible playbooks');
 
   var files = yield fs.readdir(app.config.ansiblePlaybooks);

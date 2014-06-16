@@ -1,0 +1,5 @@
+- name: Ping test
+  hosts: test
+  tasks:
+    - name: Check that the server's alive
+      action: ping
