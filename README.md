@@ -185,7 +185,64 @@ running playbooks which most probably affect your servers you will likely want t
 protect access to it.
 
 My setup is to have Ansibot placed behind an Nginx front-end 
-server, with SSL and HTTP Auth enforced and on all incoming requests. 
+server, with SSL enforced and on all incoming requests. HTTP Basic Auth is 
+enforced on the web interface but not the API to invoke triggers:
+
+```
+server {
+  listen 80;
+  server_name example.com www.example.com;
+  return 301 https://$host$request_uri;
+}
+
+server {
+  listen 443;
+  server_name example.com www.example.com;
+
+  ssl on;
+  ssl_certificate /etc/ssl/certs/server.crt;
+  ssl_certificate_key /etc/ssl/private/server.key;
+  ssl_session_timeout 5m;
+
+  # PFS
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_prefer_server_ciphers on;
+  ssl_ciphers EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA256:EECDH+aRSA+RC4:EDH+aRSA:EECDH:RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS;
+
+  root /ansibot/frontend/build;
+
+  location ~ /\. {
+    deny all;
+  }
+
+  location ~* ^/(css|fonts|img|js)/.+$ {
+    gzip_static on;
+    gzip_vary on;
+    expires 30d;
+    add_header Pragma public;
+    add_header Cache-Control "public";
+  }
+
+  location ~* ^(robots|humans)\.txt$ {
+    expires 30d;
+    add_header Pragma public;
+    add_header Cache-Control "public";
+  }
+
+  # Trigger invocation does not need auth
+  location ~* ^/invoke/ {
+    proxy_pass http://127.0.0.1:3000;
+  }
+
+  # Everything else needs auth
+  location / {
+    auth_basic on;
+    auth_basic_user_file /ansibot/httpd.auth;
+    proxy_pass http://127.0.0.1:3000;
+  }
+
+}
+```
 
 
 ## Contributing
