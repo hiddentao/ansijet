@@ -3,7 +3,7 @@
 An [Ansible](http://ansible.com/) playbook automation server.
 
 A node.js server which exposes a simple web API which triggers playbook runs 
-when a request is recieved. This is especially useful if you are unable to run 
+when a request is received. This is especially useful if you are unable to run 
 Ansible playbooks directly from within your continuous integration environment 
 or if you simply wish to automatically trigger playbooks runs based on other 
 events within your systems.
@@ -106,14 +106,14 @@ the list of Playbooks that Ansibot has found and assign triggers to them.
 ### Triggers
 
 A trigger is a mechanism which kicks of a playook run when an incoming URL 
-request is recieved. 
+request is received. 
 
 Triggers have two purposes:
 
- 1. To perform any necessary additional checks when a request is recieved to 
+ 1. To perform any necessary additional checks when a request is received to 
  ensure that the request is valid
  2. To supply variables to the Ansible playbook, allowing for playbook execution 
- to be confurable based on the incoming request and the trigger configuration.
+ to be configurable based on the incoming request and the trigger configuration.
 
 All triggers URLs look like `/invoke/<trigger id>?token=<secret token>` with 
 additional query parameters depending on the trigger type.
@@ -134,7 +134,7 @@ any Ansible playbook variables.
 **Trigger: Shippable**
 
 This exposes a URL to be called after a successful [shippable.com](shippable.com) 
-CI build. It can be configured to with a Shippable project_id and a Git branch 
+CI build. It can be configured with a Shippable project id and a Git branch 
 to execute playbooks runs for. It supplies the following Ansible variables:
 
   * `shippable_project_id`        <- configured by user
@@ -142,14 +142,15 @@ to execute playbooks runs for. It supplies the following Ansible variables:
   * `shippable_build_num`         <- obtained from incoming request
   * `shippable_build_branch`      <- obtained from incoming request
 
-_(Once [Shippable build artefacts](https://github.com/hiddentao/ansibot/issues/2) 
+_(Future improvement: once [Shippable build artefacts](https://github.com/hiddentao/ansibot/issues/2) 
 are publicly accessible Ansibot will be able to supply the build artefacts URL 
 to playbooks)._
 
 
 ### Jobs
 
-When a trigger is invoked it kicks of a _Job_. Jobs are executed in parallel by 
+When a trigger is invoked it runs a playbook, known as a _Job_. Jobs are 
+executed in parallel by 
 Ansibot, with the maximum no. of simultaenous jobs determined by the 
 `jobsInParallel` configuration parameter set during Ansibot installation. 
 Ansibot is also smart enough to ensure that for each playbook, only one instance 
@@ -185,8 +186,8 @@ running playbooks which most probably affect your servers you will likely want t
 protect access to it.
 
 My setup is to have Ansibot placed behind an Nginx front-end 
-server, with SSL enforced and on all incoming requests. HTTP Basic Auth is 
-enforced on the web interface but not the API to invoke triggers:
+server, with SSL enforced on all incoming requests. HTTP Basic Auth is 
+enforced on the web interface but not on the API for invoking triggers:
 
 ```
 server {
@@ -204,7 +205,7 @@ server {
   ssl_certificate_key /etc/ssl/private/server.key;
   ssl_session_timeout 5m;
 
-  # PFS
+  # Perfect Forward Secrecy
   ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
   ssl_prefer_server_ciphers on;
   ssl_ciphers EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA256:EECDH+aRSA+RC4:EDH+aRSA:EECDH:RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS;
