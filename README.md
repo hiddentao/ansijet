@@ -234,6 +234,13 @@ server {
     proxy_pass http://127.0.0.1:3000;
   }
 
+  # If you want to monitor the status of Ansibot and check that it is running 
+  # you can call the `/ping` URL. This will output `Ansibot up` is Ansibot is 
+  # running
+  location = /ping {
+    proxy_pass http://127.0.0.1:3000;
+  }
+
   # Everything else needs auth
   location / {
     auth_basic on;
@@ -244,9 +251,6 @@ server {
 }
 ```
 
-_Note: If you want to monitor the status of Ansibot and check that it is running 
-you can call the `/ping` URL. This will output `Ansibot up` is Ansibot is 
-running_.
 
 ## Contributing
 
