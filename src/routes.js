@@ -20,6 +20,8 @@ module.exports = {
 
   'GET /invoke/:id': 'triggers.invoke',
 
+  'GET /ping': 'main.ping',
+
   'GET /': 'main.index',
 };
 
