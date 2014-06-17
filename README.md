@@ -244,6 +244,9 @@ server {
 }
 ```
 
+_Note: If you want to monitor the status of Ansibot and check that it is running 
+you can call the `/ping` URL. This will output `Ansibot up` is Ansibot is 
+running_.
 
 ## Contributing
 
