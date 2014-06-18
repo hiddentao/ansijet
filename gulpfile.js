@@ -12,6 +12,7 @@ var minifyCSS = require('gulp-minify-css');
 var uglify = require('gulp-uglify');
 var gzip = require('gulp-gzip');
 var expect = require('gulp-expect-file');
+var mocha = require('gulp-mocha');
 
 
 
@@ -33,6 +34,8 @@ var paths = {
   ],
   jsAppFilesWatch: './frontend/src/js/**/*.js',
   jsBuildFolder: './frontend/build/js',
+
+  testFiles: './test/integration/*.test.js'
 };
 
 
@@ -103,6 +106,17 @@ gulp.task('watch', ['css', 'js'], function() {
 
 
 
+gulp.task('test', ['jshint-backend'], function () {
+  return gulp.src(paths.testFiles, { read: false })
+      .pipe(mocha({
+        ui: 'exports',
+        reporter: 'spec'
+      }))
+    ;
+});
+
+
+
 gulp.task('build', ['css', 'jshint-backend', 'js']);
 
 
@@ -121,6 +135,7 @@ gulp.task('verify_build', function() {
     ]) )
   ;
 })
+
 
 
 

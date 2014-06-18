@@ -1,15 +1,21 @@
+"use strict";
+
+
 var _ = require('lodash'),
   chai = require('chai'),
   co = require('co'),
+  mongoose = require('mongoose'),
   path = require('path'),
-  Q = require('bluebird');
+  Q = require('bluebird'),
+  waigo = require('waigo');
 
 
-exports.appFolder = path.join(__dirname, 'appFolder');
+exports.appFolder = path.join(__dirname, '..', 'src');
 
 exports.assert = chai.assert;
 exports.expect = chai.expect;
 exports.should = chai.should();
+
 
 
 
@@ -26,7 +32,7 @@ var runGen = exports.runGen = function(genFn, arg1) {
  * @return {Promise}
  */
 exports.resetDb = function() {
-  var url = 'mongodb://127.0.0.1:3306/ansibot-test';
+  var url = 'mongodb://127.0.0.1:27017/ansibot-test';
   var db = mongoose.createConnection(url);
 
   var promise = new Q(function(resolve, reject) {
@@ -67,15 +73,33 @@ exports.startAnsibot = function() {
     yield exports.resetDb();
 
     yield waigo.init({
-      appFolder: utils.appFolder
+      appFolder: exports.appFolder
     })
 
-    self.Application = waigo.load('application');
+    var Application = waigo.load('application');
 
-    yield self.Application.shutdown();  // shutdown current instance
+    yield Application.shutdown();  // shutdown current instance
 
-    yield self.Application.start();
+    yield Application.start({
+      postConfig: function(config) {
+        config.port = parseInt(10000 + Math.random() * 20000);
 
-    return self.Application;
+        config.baseURL = 'http://localhost:' + config.port;
+
+        config.ansiblePlaybooks = path.join(__dirname, 'data', 'playbooks');
+
+        config.jobsInParallel = 1;
+
+        config.db = {
+          mongo: {
+            host: '127.0.0.1',
+            port: '27017',
+            db: 'ansibot-test'
+          }
+        };
+      }
+    });
+
+    return Application;
   });
 };

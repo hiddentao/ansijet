@@ -5,7 +5,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "node --harmony `which grunt`"
+    "test": "NODE_ENV=test node --harmony `which gulp` test"
   },
   "repository": {
     "type": "git",
@@ -49,6 +49,9 @@
     "gulp-debug": "~0.3.0",
     "gulp": "~3.8.0",
     "gulp-stylus": "~1.0.2",
-    "gulp-jshint": "~1.6.3"
+    "gulp-jshint": "~1.6.3",
+    "gulp-mocha": "~0.4.1",
+    "supertest": "~0.13.0",
+    "chai": "~1.9.1"
   }
 }
