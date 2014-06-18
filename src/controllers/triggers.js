@@ -1,3 +1,6 @@
+"use strict";
+
+
 var thunkify = require('thunkify'),
   waigo = require('waigo');
 
@@ -22,7 +25,9 @@ exports.view = function*() {
 
   var trigger = yield this.app.models.Trigger.getOne(triggerId);
 
-  if (!trigger) throw new errors.RuntimeError('Trigger not found');
+  if (!trigger) {
+    throw new errors.RuntimeError('Trigger not found');
+  }
 
   var jobs = yield this.app.models.Job.getForTrigger(triggerId);
 
@@ -39,7 +44,9 @@ exports.delete = function*() {
 
   var trigger = yield this.app.models.Trigger.getOne(triggerId);
 
-  if (!trigger) throw new errors.RuntimeError('Trigger not found');
+  if (!trigger) {
+    throw new errors.RuntimeError('Trigger not found');
+  }
 
   // remove
   yield this.app.models.Log.remove({trigger: triggerId}).exec()
@@ -57,7 +64,9 @@ exports.invoke = function*() {
 
   var trigger = yield this.app.models.Trigger.getOne(triggerId);
 
-  if (!trigger) throw new errors.RuntimeError('Trigger not found');
+  if (!trigger) {
+    throw new errors.RuntimeError('Trigger not found');
+  }
 
   var job = new this.app.models.Job({
     trigger: trigger._id,

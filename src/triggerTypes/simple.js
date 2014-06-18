@@ -1,3 +1,6 @@
+"use strict";
+
+
 var _ = require('lodash'),
   https = require('https'),
   URL = require('url'),

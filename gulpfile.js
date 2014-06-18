@@ -7,6 +7,7 @@ var clean = require('gulp-clean');
 var concat = require('gulp-concat');
 var nib = require('nib');
 var stylus = require('gulp-stylus');
+var jshint = require('gulp-jshint');
 var minifyCSS = require('gulp-minify-css');
 var uglify = require('gulp-uglify');
 var gzip = require('gulp-gzip');
@@ -21,11 +22,13 @@ var paths = {
   stylusSrcFilesWatch: './frontend/src/stylus/*.styl',
   cssBuildFolder: './frontend/build/css',
 
-  jsHeadFiles: [
-    './frontend/src/bower/pace/pace.js',
+  jsServerFiles: [
+    './src/**/*.js',
+  ],
+  jsLibFiles: [
+    './frontend/src/bower/minified/dist/minified-web-src.js',
   ],
   jsAppFiles: [
-    './frontend/src/bower/minified/dist/minified-web-src.js',
     './frontend/src/js/**/*.js',
   ],
   jsAppFilesWatch: './frontend/src/js/**/*.js',
@@ -61,9 +64,26 @@ gulp.task('css', function () {
 });
 
 
+gulp.task('jshint-backend', function() {
+  return gulp.src(paths.jsServerFiles)
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'))
+    .pipe(jshint.reporter('fail'))
+  ;
+});
 
-gulp.task('js', function() {
-  return gulp.src( paths.jsAppFiles )
+
+gulp.task('jshint-frontend', function() {
+  return gulp.src(paths.jsAppFiles)
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'))
+    .pipe(jshint.reporter('fail'))
+  ;
+});
+
+
+gulp.task('js', ['jshint-frontend'], function() {
+  return gulp.src( [].concat(paths.jsLibFiles, paths.jsAppFiles) )
     .pipe( concat('app.js') )
     .pipe( uglify() )
     .pipe( gulp.dest(paths.jsBuildFolder) )
@@ -83,7 +103,7 @@ gulp.task('watch', ['css', 'js'], function() {
 
 
 
-gulp.task('build', ['css', 'js']);
+gulp.task('build', ['css', 'jshint-backend', 'js']);
 
 
 gulp.task('verify_build', function() {

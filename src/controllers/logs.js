@@ -1,3 +1,5 @@
+"use strict";
+
 exports.index = function*() {
   var logs = yield this.app.models.Log.getRecent(1000);
 

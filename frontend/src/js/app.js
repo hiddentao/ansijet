@@ -2,7 +2,8 @@ var MINI = require('minified');
 var _=MINI._, $=MINI.$, $$=MINI.$$, EE=MINI.EE, HTML=MINI.HTML;
 
 $.ready(function() {
-
+  "use strict";
+  
   // expandable/collapsible content sections
   $('.expandable').each(function(elem) {
     var collapsed = $('.collapsed', elem)[0];

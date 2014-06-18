@@ -48,12 +48,12 @@ jobSchema.method('execute', function*() {
     var trigger = yield app.models.Trigger.getOne(this.trigger);
 
     // check token
-    if (trigger.token != this.queryParams.token) {
+    if (trigger.token !== this.queryParams.token) {
       throw new Error('Incorrect auth token');
     }
 
     // trigger type
-    var triggerType = new app.triggerTypes[trigger.type];
+    var triggerType = new app.triggerTypes[trigger.type]();
 
     // playbook
     var playbook = yield app.models.Playbook.getOne(this.trigger.playbook);

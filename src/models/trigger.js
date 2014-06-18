@@ -37,7 +37,7 @@ triggerSchema.pre('save', function(next){
 triggerSchema.virtual('invokeUrlTemplate').get(function() {
   var app = waigo.load('application').app;
 
-  var triggerType = new app.triggerTypes[this.type]; 
+  var triggerType = new app.triggerTypes[this.type](); 
 
   var urlParams = triggerType.getQueryParams();
   // add token to url params list
@@ -73,7 +73,7 @@ triggerSchema.virtual('ansibleVars').get(function() {
 
   var app = waigo.load('application').app;
 
-  var triggerType = new app.triggerTypes[this.type]; 
+  var triggerType = new app.triggerTypes[this.type](); 
 
   var ret = {};
 

@@ -48,6 +48,7 @@
     "gulp-expect-file": "0.0.6",
     "gulp-debug": "~0.3.0",
     "gulp": "~3.8.0",
-    "gulp-stylus": "~1.0.2"
+    "gulp-stylus": "~1.0.2",
+    "gulp-jshint": "~1.6.3"
   }
 }

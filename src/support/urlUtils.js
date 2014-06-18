@@ -1,3 +1,6 @@
+"use strict";
+
+
 var Q = require('bluebird'),
   requestLib = require('follow-redirects'),
   url = require('url');

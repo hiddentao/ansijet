@@ -1,3 +1,6 @@
+"use strict";
+
+
 var _ = require('lodash'),
   thunkify = require('thunkify'),
   waigo = require('waigo');
@@ -106,7 +109,7 @@ exports.addTrigger_getStep2 = function*() {
   var addTriggerForm = Form.new('addTrigger');
   addTriggerForm.state = this.session.createTriggerFormState;
 
-  var triggerType = new this.app.triggerTypes[addTriggerForm.fields.type.value];
+  var triggerType = new this.app.triggerTypes[addTriggerForm.fields.type.value]();
 
   var paramsForm = triggerType.getConfigParamsForm();
 
@@ -129,7 +132,7 @@ exports.addTrigger_submitStep2 = function*() {
   var addTriggerForm = Form.new('addTrigger');
   addTriggerForm.state = this.session.createTriggerFormState;
 
-  var triggerType = new this.app.triggerTypes[addTriggerForm.fields.type.value];
+  var triggerType = new this.app.triggerTypes[addTriggerForm.fields.type.value]();
 
   var paramsForm = triggerType.getConfigParamsForm();
 

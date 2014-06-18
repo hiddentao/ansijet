@@ -36,7 +36,7 @@ module.exports = function*(app) {
     var file = files[i];
 
     // assume all .yml files in this folder are playbooks
-    if ('.yml' == path.extname(file).toLowerCase()) {
+    if ('.yml' === path.extname(file).toLowerCase()) {
       var name = path.basename(file, '.yml');
 
       debug('Playbook found: ' + name);
@@ -46,7 +46,7 @@ module.exports = function*(app) {
       if (!obj) {
         debug('Adding to db: ' + name);
 
-        var obj = new app.models.Playbook({
+        obj = new app.models.Playbook({
           name: name,
           path: path.join(app.config.ansiblePlaybooks, file)
         });        

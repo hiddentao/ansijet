@@ -1,3 +1,6 @@
+"use strict";
+
+
 var _ = require('lodash'),
   URL = require('url'),
   util = require('util');
@@ -89,8 +92,7 @@ Shippable.prototype.process = function*(configParams, queryParams) {
       shippable_project_id: configParams.shippable_project_id,
       shippable_expected_branch: configParams.shippable_expected_branch,
       shippable_build_branch: queryParams.shippable_build_branch,
-      shippable_build_num: params.shippable_build_num,
-      shippable_build_artifacts_url: artifactsUrl,      
+      shippable_build_num: queryParams.shippable_build_num
     }
   };
 };

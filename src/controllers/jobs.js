@@ -1,3 +1,6 @@
+"use strict";
+
+
 var waigo = require('waigo');
 
 var errors = waigo.load('support/errors');
@@ -8,7 +11,9 @@ exports.view = function*() {
 
   var job = yield this.app.models.Job.getOne(jobId);
 
-  if (!job) throw new errors.RuntimeError('Job not found');
+  if (!job) {
+    throw new errors.RuntimeError('Job not found');
+  }
 
   var logs = yield this.app.models.Log.getForJob(jobId);
 
