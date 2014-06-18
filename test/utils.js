@@ -18,13 +18,13 @@ exports.should = chai.should();
 
 
 /** 
- * Wait for given no. of seconds
- * @param  {Number} seconds Seconds.
+ * Wait for given no. of milliseconds
+ * @param  {Number} ms milliseconds.
  * @return {Promise}
  */
-exports.waitFor = function(seconds) {
+exports.waitFor = function(ms) {
   return new Q(function(resolve) {
-    setTimeout(resolve, seconds * 1000);
+    setTimeout(resolve, ms);
   });
 }
 
@@ -110,7 +110,10 @@ exports.startAnsibot = function(customConfig) {
           }
         };
 
-        _.extend(config, customConfig);
+        _.extend(config, {
+          // for testing we want instant job gratification
+          jobProcessingIntervalMs: 0
+        }, customConfig);
       }
     });
 
@@ -133,4 +136,15 @@ exports.stopAnsibot = function() {
     yield Application.shutdown();  // shutdown current instance
   });
 };
+
+
+/**
+ * Close all db connections
+ * 
+ * @return {Promise}
+ */
+exports.closeAllDbConnections = function() {
+  return Q.promisify(mongoose.disconnect, mongoose)();
+};
+
 

@@ -84,6 +84,8 @@ Exec.prototype._onClose = function(defer) {
   var self = this;
 
   return function(code) {
+    clearTimeout(self._currentOutputTimeoutTimer);
+
     self._childKilled = true;
 
     if (0 !== code) {
@@ -112,6 +114,8 @@ Exec.prototype._onError = function(defer) {
   var self = this;
 
   return function(err) {
+    clearTimeout(self._currentOutputTimeoutTimer);
+
     self._childKilled = true;
 
     if (self._killReason) {

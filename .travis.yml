@@ -1,0 +1,26 @@
+branches:
+  only:
+    - master
+
+language: node_js
+
+services:
+  - mongodb
+
+node_js:
+  - "0.11"
+
+before_script:
+  - "npm install -g gulp"
+  - "npm install -g bower"
+  - "npm install"
+  - "bower install"
+  - "gulp ci"
+
+script:
+  - "NODE_ENV=test node --harmony `which grunt`"
+
+notifications:
+  email:
+    - ram@hiddentao.com
+

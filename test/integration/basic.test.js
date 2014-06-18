@@ -35,8 +35,13 @@ var _testSetup = function(customConfig, done) {
 
 
 var _testShutdown = function(done) {
-  utils.stopAnsibot().nodeify(done);
+  utils.stopAnsibot()
+    .then(function() {
+      return utils.closeAllDbConnections();
+    })
+    .nodeify(done);
 };
+
 
 
 
@@ -236,12 +241,10 @@ test['invoke trigger'] = {
     'bad token': function(done) {
       var self = this;
 
-      self.timeout(9000);
-
       self.request.get('/invoke/' + self.trigger._id + '?token=blah')
         .expect(200)
         .then(function() {
-          return utils.waitFor(7);
+          return utils.waitFor(1000);
         })
         .then(function() {
           return Q.resolve(self.app.models.Job.getForTrigger(self.trigger._id))
@@ -272,7 +275,7 @@ test['invoke trigger'] = {
       self.request.get('/invoke/' + self.trigger._id + '?token=' + self.trigger.token)
         .expect(200)
         .then(function(err) {
-          return utils.waitFor(7)
+          return utils.waitFor(1000);
         })
         .then(function() {
           return Q.resolve(self.app.models.Job.getForTrigger(self.trigger._id));
@@ -328,11 +331,19 @@ test['no. of jobs in parallel'] = {
             configParams: {}
           });
 
+          self.triggerB2 = new self.app.models.Trigger({
+            playbook: self.playbookB._id,
+            description: 'test p2 t2',
+            type: 'simple',
+            configParams: {}
+          });
+
           return Q.all([
             Q.promisify(self.triggerA1.save).call(self.triggerA1),
             Q.promisify(self.triggerA2.save).call(self.triggerA2),
             Q.promisify(self.playbookB.save).call(self.playbookB),
             Q.promisify(self.triggerB1.save).call(self.triggerB1),
+            Q.promisify(self.triggerB2.save).call(self.triggerB2),
           ]);
         })
         .nodeify(done);      
@@ -344,8 +355,6 @@ test['no. of jobs in parallel'] = {
   
   'respects the limit': function(done) {
     var self = this;
-
-    self.timeout(9000);
 
     Q.all(
       (function() {
@@ -366,7 +375,7 @@ test['no. of jobs in parallel'] = {
       })()
     )
       .then(function() {
-        return utils.waitFor(7);
+        return utils.waitFor(1000);
       })
       .then(function() {
         return Q.resolve(
@@ -389,20 +398,18 @@ test['no. of jobs in parallel'] = {
   'max. 1 job per playbook': function(done) {
     var self = this;
 
-    self.timeout(9000);
-
     Q.all(
       (function() {
         var ret = [];
 
         for (var i=0; i<3; ++i) {
           ret.push(
-            self.request.get('/invoke/' + self.triggerA1._id 
-              + '?token=' + self.triggerA1.token).expect(200)
+            self.request.get('/invoke/' + self.triggerB1._id 
+              + '?token=' + self.triggerB1.token).expect(200)
           );
           ret.push(
-            self.request.get('/invoke/' + self.triggerA2._id 
-              + '?token=' + self.triggerA2.token).expect(200)
+            self.request.get('/invoke/' + self.triggerB2._id 
+              + '?token=' + self.triggerB2.token).expect(200)
           );
         }
 
@@ -410,7 +417,7 @@ test['no. of jobs in parallel'] = {
       })()
     )
       .then(function() {
-        return utils.waitFor(7);
+        return utils.waitFor(1000);
       })
       .then(function() {
         return Q.resolve(
@@ -421,7 +428,7 @@ test['no. of jobs in parallel'] = {
         if (!jobs || 0 === jobs.length) throw new Error('Jobs not found');
 
         var processing = _.filter(jobs, function(j) {
-          return 'processing' === j.status || 'completed' === j.status;
+          return 'processing' === j.status;
         });
 
         expect(processing.length).to.eql(1);
@@ -437,7 +444,7 @@ test['job output timeout'] = {
     var self = this;
 
     _testSetup.call(self, {
-      outputTimeout: 10
+      outputTimeout: 5
     }, function(err) {
       if (err) return done(err);
 
@@ -469,15 +476,15 @@ test['job output timeout'] = {
   },
 
   
-  'times out': function(done) {
+  'stops job if takes too long': function(done) {
     var self = this;
 
-    self.timeout(25000);
+    self.timeout(8000);
 
     self.request.get('/invoke/' + self.triggerA1._id + '?token=' + self.triggerA1.token)
       .expect(200)
       .then(function() {
-        return utils.waitFor(20);
+        return utils.waitFor(6000);
       })
       .then(function() {
         return Q.resolve(
@@ -495,7 +502,6 @@ test['job output timeout'] = {
       })
       .then(function(logs) {
         var log = _.find(logs, function(log) {
-          console.log(log.text);
           return 'Killed by Ansibot: Output timed out' === log.text;
         });
 

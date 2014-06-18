@@ -113,5 +113,5 @@ module.exports = function*(app) {
 
   app.logger.info('Start job processing timer');
 
-  buildTimerLoopFunction(app, parallelJobs, 5000)();
+  buildTimerLoopFunction(app, parallelJobs, app.config.jobProcessingIntervalMs)();
 };

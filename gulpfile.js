@@ -13,6 +13,7 @@ var uglify = require('gulp-uglify');
 var gzip = require('gulp-gzip');
 var expect = require('gulp-expect-file');
 var mocha = require('gulp-mocha');
+var runSequence = require('run-sequence');
 
 
 
@@ -67,14 +68,6 @@ gulp.task('css', function () {
 });
 
 
-gulp.task('jshint-backend', function() {
-  return gulp.src(paths.jsServerFiles)
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'))
-    .pipe(jshint.reporter('fail'))
-  ;
-});
-
 
 gulp.task('jshint-frontend', function() {
   return gulp.src(paths.jsAppFiles)
@@ -106,21 +99,10 @@ gulp.task('watch', ['css', 'js'], function() {
 
 
 
-gulp.task('test', ['jshint-backend'], function () {
-  return gulp.src(paths.testFiles, { read: false })
-      .pipe(mocha({
-        ui: 'exports',
-        reporter: 'spec'
-      }))
-    ;
-});
+gulp.task('build-frontend', ['css', 'js']);
 
 
-
-gulp.task('build', ['css', 'jshint-backend', 'js']);
-
-
-gulp.task('verify_build', function() {
+gulp.task('verify-frontend-build', function() {
   return gulp.src(
       [].concat(
         path.join(paths.cssBuildFolder, '**', '*.*'),
@@ -138,9 +120,43 @@ gulp.task('verify_build', function() {
 
 
 
+gulp.task('jshint-backend', function() {
+  return gulp.src(paths.jsServerFiles)
+    .pipe(jshint())
+    .pipe(jshint.reporter('default'))
+    .pipe(jshint.reporter('fail'))
+  ;
+});
+
+
+gulp.task('build-backend', ['jshint-backend']);
+
+
+
+gulp.task('test', function () {
+  return gulp.src(paths.testFiles, { read: false })
+      .pipe(mocha({
+        ui: 'exports',
+        reporter: 'spec'
+      }))
+    ;
+});
+
+
+
+
 
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['build']);
+gulp.task('ci', function(cb) {
+  runSequence(
+    'clean', 
+    'build-frontend', 
+    'verify-frontend-build', 
+    'build-backend', 
+    'test', 
+    cb
+  );
+});
 
 
 

@@ -24,6 +24,8 @@ module.exports = function(config) {
 
   waigo.load('waigo:config/base')(config);
 
+  config.jobProcessingIntervalMs = 5000;
+
   config.db = {
     mongo: {
       host: '127.0.0.1',
