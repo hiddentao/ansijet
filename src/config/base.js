@@ -53,6 +53,11 @@ module.exports = function(config) {
     'startJobProcessor'
   ];
 
+  config.shutdownSteps = [
+    'stopJobProcessor',
+    'listener',
+  ];
+
   config.middleware.options.staticResources = {
     folder: '../frontend/build'
   };

@@ -33,7 +33,7 @@ var Exec = function(cmd, options) {
  *
  * If successful the result will be of the form `{stdout: ..., stderr: ...}`.
  * 
- * If failed then the result will be an `Error` with the `code` set to status 
+ * If failed then the result will be an `Error` with the `exitCode` set to exit  
  * code (-1 if failed to spawn), and `stdout` set to stdout and `stderr` set 
  * to stderr.
  * 
@@ -88,7 +88,7 @@ Exec.prototype._onClose = function(defer) {
 
     if (0 !== code) {
       var err = new Error(self._stdout + "\n" + self._stderr);
-      err.code = code;
+      err.exitCode = code;
       (self._onError(defer))(err);
     } else {
       defer.resolve({
@@ -114,12 +114,11 @@ Exec.prototype._onError = function(defer) {
   return function(err) {
     self._childKilled = true;
 
-    if (undefined === err.code) {
-      err.code = -1;
-    }
-
     if (self._killReason) {
-      err.message = 'Manually killed: ' + self._killReason;
+      err.exitCode = null;
+      err.message = 'Killed by Ansibot: ' + self._killReason;
+    } else {
+      err.exitCode = err.code || -1;
     }
 
     err.stdout = self._stdout;

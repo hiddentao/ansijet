@@ -11,9 +11,15 @@ var debug = require('debug')('ansibot-job-processor'),
 
 
 
-var buildRunFunction = function(app, maxParallelJobs) {
-  return function() {
+var buildTimerLoopFunction = function(app, maxParallelJobs, timerIntervalMs) {
+  var timerLoopFn;
+
+  return (timerLoopFn = function() {
     co(function*() {
+      if (app.stopJobProcessing) {
+        return;
+      }
+
       var activeJobs = 
         yield app.models.Job.getActive();
 
@@ -67,8 +73,14 @@ var buildRunFunction = function(app, maxParallelJobs) {
       if (err) {
         app.logger.error('Job processing error', err.stack);
       }
+
+      if (app.stopJobProcessing) {
+        return debug('Stopping job processor');
+      }
+
+      setTimeout(timerLoopFn, timerIntervalMs);
     });
-  };
+  });
 };
 
 
@@ -100,5 +112,6 @@ module.exports = function*(app) {
   debug('Max parallel jobs: ' + parallelJobs);
 
   app.logger.info('Start job processing timer');
-  setInterval(buildRunFunction(app, parallelJobs), 10000);
+
+  buildTimerLoopFunction(app, parallelJobs, 5000)();
 };

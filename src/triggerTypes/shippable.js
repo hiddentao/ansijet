@@ -32,10 +32,6 @@ Shippable.prototype.ansibleVariables = function() {
       type: 'config',
       desc: 'The branch to deploy'
     },
-    // shippable_build_artifacts_url: {
-    //   type: 'generated',
-    //   desc: 'URL to deployable build artifacts zipfile'
-    // },
     shippable_build_num: {
       type: 'query',
       desc: 'The build number',
@@ -73,19 +69,6 @@ Shippable.prototype.process = function*(configParams, queryParams) {
     };
   }
 
-  /*
-  Build artefacts can no longer be accessed without auth so let's skip this 
-  section until https://github.com/Shippable/support/issues/205 is fixed.
-   */
-  // var artifactsUrl = 'https://api.shippable.com/projects/' + configParams.shippable_project_id + '/builds/' + queryParams.shippable_build_num + '/artifacts';
-  // // check that artifacts can be accessed
-  // try {
-  //   yield urlUtils.check(artifactsUrl);
-  // } catch (err) {
-  //   throw new Error('Build artifacts not accessible: ' + artifactsUrl + ', ' + err.toString());
-  // }
-  // TODO check that this is the latest build
-  
   return {
     proceed: true,
     ansibleVars: {

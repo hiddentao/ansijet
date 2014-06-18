@@ -17,13 +17,23 @@ exports.expect = chai.expect;
 exports.should = chai.should();
 
 
+/** 
+ * Wait for given no. of seconds
+ * @param  {Number} seconds Seconds.
+ * @return {Promise}
+ */
+exports.waitFor = function(seconds) {
+  return new Q(function(resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+}
+
 
 
 var runGen = exports.runGen = function(genFn, arg1) {
   var fn = Q.promisify(co(genFn));
   return fn.apply(fn, _.toArray(arguments).slice(1));
 }
-
 
 
 /** 
@@ -65,10 +75,12 @@ exports.resetDb = function() {
  * Start Ansibot server to test against.
  *
  * This will call `resetDb` before starting the server.
+ *
+ * @param {Object} [customConfig] App configuration settings to set.
  * 
  * @return {Promise}
  */
-exports.startAnsibot = function() {
+exports.startAnsibot = function(customConfig) {
   return runGen(function*() {
     yield exports.resetDb();
 
@@ -97,9 +109,28 @@ exports.startAnsibot = function() {
             db: 'ansibot-test'
           }
         };
+
+        _.extend(config, customConfig);
       }
     });
 
     return Application;
   });
 };
+
+
+
+/** 
+ * Stop Ansibot server to test against.
+ *
+ * @return {Promise}
+ */
+exports.stopAnsibot = function() {
+  return runGen(function*() {
+    yield exports.resetDb();
+    var Application = waigo.load('application');
+
+    yield Application.shutdown();  // shutdown current instance
+  });
+};
+

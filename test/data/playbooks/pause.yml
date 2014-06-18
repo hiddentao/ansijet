@@ -1,0 +1,6 @@
+- name: Pause test
+  hosts: test
+  gather_facts: no
+  tasks:
+    - name: Pause
+      action: pause minutes=2

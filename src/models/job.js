@@ -108,8 +108,8 @@ jobSchema.method('execute', function*() {
       this.status = 'completed';
     }
   } catch (err) {
-    if (undefined !== err.code) {
-      yield this.log('Exit code: ' + err.code + '\n\n' 
+    if (err.exitCode) {
+      yield this.log('Exit code: ' + err.exitCode + '\n\n' 
           + err.stdout, { console: true, error: true });
     } else {
       yield this.log(err.message, { error: true });

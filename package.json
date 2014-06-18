@@ -35,7 +35,7 @@
     "moment": "~2.6.0",
     "waigo-method-override": "~1.0.0",
     "co": "~3.0.6",
-    "waigo": "~1.4.1",
+    "waigo": "~1.5.1",
     "follow-redirects": "0.0.3"
   },
   "devDependencies": {
@@ -51,7 +51,7 @@
     "gulp-stylus": "~1.0.2",
     "gulp-jshint": "~1.6.3",
     "gulp-mocha": "~0.4.1",
-    "supertest": "~0.13.0",
-    "chai": "~1.9.1"
+    "chai": "~1.9.1",
+    "supertest-as-promised": "~0.1.1"
   }
 }
