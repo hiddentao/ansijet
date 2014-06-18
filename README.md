@@ -5,8 +5,8 @@ An [Ansible](http://ansible.com/) playbook automation server.
 A node.js server which exposes a simple web API which triggers playbook runs 
 when a request is received. This is especially useful if you are unable to run 
 Ansible playbooks directly from within your continuous integration environment 
-or if you simply wish to automatically trigger playbooks runs based on other 
-events within your systems.
+or if you simply wish to trigger playbook runs based on other 
+events within your system.
 
 Features:
  * Trigger playbook runs [different sources](#triggers), including from Continous Integration systems such as [Shippable](https://www.shippable.com).
@@ -91,7 +91,7 @@ override these too within the `config/production.js` you created.
 
 ```bash
 $ cd ansibot
-$ ./start-app.js
+$ NODE_ENV=production ./start-app.js
 ```
 
 If you visit `http://localhost:3000` you should see the dashboard showing the 
