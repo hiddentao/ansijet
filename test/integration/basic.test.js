@@ -34,7 +34,7 @@ var _testSetup = function(customConfig, done) {
 
 
 
-var _testShutdown = function(done) {
+var _testTeardown = function(done) {
   utils.stopAnsibot()
     .then(function() {
       return utils.closeAllDbConnections();
@@ -47,7 +47,7 @@ var _testShutdown = function(done) {
 
 test['view playbooks'] = {
   before: _testSetup,
-  after: _testShutdown,
+  after: _testTeardown,
 
   'index': function(done) {
     var self = this;
@@ -107,7 +107,7 @@ test['view playbooks'] = {
 
 test['simple trigger'] = {
   before: _testSetup,
-  after: _testShutdown,
+  after: _testTeardown,
 
   'get step1': function(done) {
     var self = this;
@@ -203,7 +203,7 @@ test['simple trigger'] = {
 
 test['invoke trigger'] = {
   before: _testSetup,
-  after: _testShutdown,
+  after: _testTeardown,
 
   'simple trigger': {
 
@@ -350,7 +350,7 @@ test['no. of jobs in parallel'] = {
     });
   },
 
-  afterEach: _testShutdown,
+  afterEach: _testTeardown,
 
   
   'respects the limit': function(done) {
@@ -444,7 +444,7 @@ test['job output timeout'] = {
     var self = this;
 
     _testSetup.call(self, {
-      outputTimeout: 5
+      outputTimeout: 1
     }, function(err) {
       if (err) return done(err);
 
@@ -468,7 +468,7 @@ test['job output timeout'] = {
     });
   },
 
-  after: _testShutdown,
+  after: _testTeardown,
 
 
   afterEach: function(done) {
@@ -479,12 +479,12 @@ test['job output timeout'] = {
   'stops job if takes too long': function(done) {
     var self = this;
 
-    self.timeout(8000);
+    self.timeout(5000);
 
     self.request.get('/invoke/' + self.triggerA1._id + '?token=' + self.triggerA1.token)
       .expect(200)
       .then(function() {
-        return utils.waitFor(6000);
+        return utils.waitFor(3000);
       })
       .then(function() {
         return Q.resolve(

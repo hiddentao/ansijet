@@ -37,7 +37,8 @@
     "waigo-method-override": "~1.0.0",
     "co": "~3.0.6",
     "waigo": "~1.5.1",
-    "follow-redirects": "0.0.3"
+    "follow-redirects": "0.0.3",
+    "clockmaker": "~1.1.1"
   },
   "devDependencies": {
     "nib": "~1.0.2",

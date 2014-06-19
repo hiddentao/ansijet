@@ -100,8 +100,6 @@ exports.startAnsibot = function(customConfig) {
 
         config.ansiblePlaybooks = path.join(__dirname, 'data', 'playbooks');
 
-        config.jobsInParallel = 1;
-
         config.db = {
           mongo: {
             host: '127.0.0.1',

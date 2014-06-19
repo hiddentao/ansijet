@@ -8,77 +8,60 @@ var debug = require('debug')('ansibot-job-processor'),
   thunkify = require('thunkify'),
   waigo = require('waigo');
 
+var timers = waigo.load('support/timers');
 
 
 
-var buildTimerLoopFunction = function(app, maxParallelJobs, timerIntervalMs) {
-  var timerLoopFn;
 
-  return (timerLoopFn = function() {
-    co(function*() {
-      if (app.stopJobProcessing) {
-        return;
+var buildTimerHandler = function(app, maxParallelJobs) {
+  return co(function*() {
+    var activeJobs = yield app.models.Job.getActive();
+
+    debug('Processing ' + activeJobs.length + ' jobs');
+
+    /*
+    Rules:
+    - No more than maxParallelJobs jobs in progress at the same time
+    - No more than one job for any given playbook in progress at a time
+
+    By 'in progress' we mean job state === 'processing'.
+     */
+
+    var pendingJobs = [],
+      processingJobs = [],
+      playbookProcessingJobs = {};
+
+    activeJobs.forEach(function(job) {
+      if ('processing' === job.status) {
+        processingJobs.push(job);
+        playbookProcessingJobs[job.trigger.playbook] = true;
+      } else if ('created' === job.status) {
+        pendingJobs.push(job);
       }
+    }); 
 
-      var activeJobs = 
-        yield app.models.Job.getActive();
+    var jobsToExecute = [];
 
-      debug('Processing ' + activeJobs.length + ' jobs');
+    while (maxParallelJobs > processingJobs.length && 0 < pendingJobs.length) {
+      // list is in reverse chrono order and we want to deal with the oldest job first
+      var nextPendingJob = pendingJobs.pop();
 
-      /*
-      Rules:
-      - No more than maxParallelJobs jobs in progress at the same time
-      - No more than one job for any given playbook in progress at a time
+      // check that we're not already executing the given playbook
+      if (playbookProcessingJobs[nextPendingJob.trigger.playbook]) {
+        continue;
+      } else {
+        // add this job to execution queue
+        jobsToExecute.push(nextPendingJob);
 
-      By 'in progress' we mean job state === 'processing'.
-       */
-
-      var pendingJobs = [],
-        processingJobs = [],
-        playbookProcessingJobs = {};
-
-      activeJobs.forEach(function(job) {
-        if ('processing' === job.status) {
-          processingJobs.push(job);
-          playbookProcessingJobs[job.trigger.playbook] = true;
-        } else if ('created' === job.status) {
-          pendingJobs.push(job);
-        }
-      }); 
-
-      var jobsToExecute = [];
-
-      while (maxParallelJobs > processingJobs.length && 0 < pendingJobs.length) {
-        // list is in reverse chrono order and we want to deal with the oldest job first
-        var nextPendingJob = pendingJobs.pop();
-
-        // check that we're not already executing the given playbook
-        if (playbookProcessingJobs[nextPendingJob.trigger.playbook]) {
-          continue;
-        } else {
-          // add this job to execution queue
-          jobsToExecute.push(nextPendingJob);
-
-          // update other lists
-          processingJobs.push(nextPendingJob);
-          playbookProcessingJobs[nextPendingJob.trigger.playbook] = true;
-        }
+        // update other lists
+        processingJobs.push(nextPendingJob);
+        playbookProcessingJobs[nextPendingJob.trigger.playbook] = true;
       }
+    }
 
-      // run all the new jobs in parallel
-      yield jobsToExecute.map(function(j) {
-        return j.execute();
-      });
-    })(function(err) {
-      if (err) {
-        app.logger.error('Job processing error', err.stack);
-      }
-
-      if (app.stopJobProcessing) {
-        return debug('Stopping job processor');
-      }
-
-      setTimeout(timerLoopFn, timerIntervalMs);
+    // run all the new jobs in parallel
+    yield jobsToExecute.map(function(j) {
+      return j.execute();
     });
   });
 };
@@ -113,5 +96,15 @@ module.exports = function*(app) {
 
   app.logger.info('Start job processing timer');
 
-  buildTimerLoopFunction(app, parallelJobs, app.config.jobProcessingIntervalMs)();
+  timers.new(
+      buildTimerHandler(app, parallelJobs),
+      app.config.jobProcessingIntervalMs,
+      { 
+        repeat: true,
+        async: true,
+        onError: function(err) {
+          app.logger.error('Job processing error: ' + err.message);
+        }
+      }
+  ).start();
 };

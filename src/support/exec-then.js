@@ -2,9 +2,12 @@
 
 var _ = require('lodash'),
   spawn = require('child_process').spawn,
-  Q = require('bluebird');
+  Q = require('bluebird'),
+  waigo = require('waigo');
 
 var Writable = require('stream').Writable;
+
+var timers = waigo.load('support/timers');
 
 
 
@@ -13,13 +16,22 @@ var Writable = require('stream').Writable;
  * @constructor
  * @param {String} cmd Command to execute.
  * @param {Object} [options] Additional options to pass to child_process.spawn().
- * @param {Number} [options.outputTimeout] Timeout for output in seconds. If no output recieved within this time period then the call is terminated.
+ * @param {Number} [options.outputTimeout] Timeout for output in seconds. If no output recieved within this time period then the call is terminated. If not set or if 0 then 300 seconds is assumed.
  */
 var Exec = function(cmd, options) {
   var cmdArgs = cmd.split(' ');
   this._cmd = cmdArgs[0];
   this._args = cmdArgs.slice(1);
   this._options = options || {};
+
+  this._outputTimeoutTimer = timers.new(
+    this._outputTimeoutHandler,
+    (this._options.outputTimeout || 300) * 1000,
+    {
+      this: this,
+      repeat: true
+    }
+  );
 };
 
 
@@ -55,16 +67,17 @@ Exec.prototype.run = function() {
       detached: true
     })
   );
-  self._initOutputTimeoutTimer();
+
+  self._outputTimeoutTimer.start();
 
   self._child.stdout.on('data', function(data){
     self._stdout += data;
-    self._initOutputTimeoutTimer();
+    self._outputTimeoutTimer.synchronize();
   });
 
   self._child.stderr.on('data', function(data){
     self._stderr += data;
-    self._initOutputTimeoutTimer();
+    self._outputTimeoutTimer.synchronize();
   });
 
   self._child.on('close', self._onClose(defer));
@@ -84,7 +97,7 @@ Exec.prototype._onClose = function(defer) {
   var self = this;
 
   return function(code) {
-    clearTimeout(self._currentOutputTimeoutTimer);
+    self._outputTimeoutTimer.stop();
 
     self._childKilled = true;
 
@@ -114,7 +127,7 @@ Exec.prototype._onError = function(defer) {
   var self = this;
 
   return function(err) {
-    clearTimeout(self._currentOutputTimeoutTimer);
+    self._outputTimeoutTimer.stop();
 
     self._childKilled = true;
 
@@ -136,32 +149,20 @@ Exec.prototype._onError = function(defer) {
 
 
 /** 
- * Initialise output timeout timer.
+ * Handle an output timeout timer tick.
  *
- * This initialises a timer which executes if no output is obtained within a 
- * given time period. The time period is obtained from the initial options 
- * passed to the instance constructor. If no timer period was set then this 
- * method does nothing.
+ * If this gets called then it means no output has been received for the 
+ * configured timeout period, and so we have a problem.
  * 
  * @private
  */
-Exec.prototype._initOutputTimeoutTimer = function() {
-  var self = this;
-
-  if (self._options.outputTimeout) {
-    if (self._currentOutputTimeoutTimer) {
-      clearTimeout(self._currentOutputTimeoutTimer);
-    }
-
-    self._currentOutputTimeoutTimer = setTimeout(function() {
-      // if not already exited
-      if (!self._childKilled) {
-        // note that we're killing it manually
-        self._killReason = 'Output timed out';
-        // kill it
-        self._child.kill();
-      }
-    }, self._options.outputTimeout * 1000);
+Exec.prototype._outputTimeoutHandler = function() {
+  // if not already exited
+  if (!this._childKilled) {
+    // note that we're killing it manually
+    this._killReason = 'Output timed out';
+    // kill it
+    this._child.kill();
   }
 };
 

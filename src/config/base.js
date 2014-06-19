@@ -56,7 +56,7 @@ module.exports = function(config) {
   ];
 
   config.shutdownSteps = [
-    'stopJobProcessor',
+    'stopAllTimers',
     'listener',
   ];
 
