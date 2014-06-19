@@ -1,5 +1,7 @@
 # Ansibot
 
+[![Build Status](https://secure.travis-ci.org/hiddentao/ansibot.png)](http://travis-ci.org/hiddentao/ansibot)
+
 An [Ansible](http://ansible.com/) playbook automation server.
 
 A node.js server which exposes a simple web API which triggers playbook runs 
