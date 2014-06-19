@@ -11,6 +11,7 @@ node_js:
   - "0.11"
 
 before_script:
+  - "pip install ansible"
   - "npm install -g gulp"
   - "npm install -g bower"
   - "npm install"
