@@ -15,10 +15,9 @@ before_script:
   - "npm install -g bower"
   - "npm install"
   - "bower install"
-  - "gulp ci"
 
 script:
-  - "NODE_ENV=test node --harmony `which grunt`"
+  - "npm run ci"
 
 notifications:
   email:

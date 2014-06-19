@@ -56,7 +56,7 @@ module.exports = function(config) {
   ];
 
   config.shutdownSteps = [
-    'stopAllTimers',
+    'cleanupResources',
     'listener',
   ];
 

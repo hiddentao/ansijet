@@ -169,6 +169,11 @@ Exec.prototype._outputTimeoutHandler = function() {
 
 
 
+/**
+ * All `Exec` instances.
+ * @type {Array}
+ */
+var execInstances = [];
 
 
 /**
@@ -181,7 +186,42 @@ Exec.prototype._outputTimeoutHandler = function() {
  * @return {Promise}
  */
 module.exports = function(cmd, options) {
-  return new Exec(cmd, options).run();
+  var e = new Exec(cmd, options);
+  execInstances.push(e);
+  return e.run();
 };
+
+
+
+
+/**
+ * Kill all executions that haven't yet completed.
+ * @return {Promise}
+ */
+module.exports.killPendingExecs = function() {
+  return Q.all(
+    execInstances.map(function(exec) {
+      if (!exec._childKilled) {
+        return new Q(function(resolve) {
+          exec._child.removeAllListeners();
+
+          var fn = function() {
+            exec._childKilled = true;
+            resolve();
+          }
+
+          exec._child.on('close', fn);
+          exec._child.on('error', fn);
+
+          exec._child.kill();
+        });
+      } else {
+        return null;
+      }
+    })
+  );
+};
+
+
 
 
