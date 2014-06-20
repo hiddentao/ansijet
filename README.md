@@ -158,6 +158,12 @@ Ansibot, with the maximum no. of simultaenous jobs determined by the
 Ansibot is also smart enough to ensure that for each playbook, only one instance 
 of it is being run at a time.
 
+Each job - i.e. playbook run - takes place in a separate shell process, allowing 
+Ansibot to be scaled up according to your machine's cores. Ansibot also 
+monitors each shell process such that if no output is received for 5 minutes 
+(this time window is configurable) it will kill the shell process 
+and assume the playbook run has failed.
+
 When a job is being processed it shows up as an _Active Job_ on your Ansibot 
 server's homepage. You can click on it to view the current log output, including 
 console log output.
