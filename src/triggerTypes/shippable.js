@@ -53,9 +53,9 @@ Shippable.prototype.ansibleVariables = function() {
  *
  * This checks the following:
  * 
- * - That the request did indeed come from Shippable
- * - That the build id is of the latest build for this project
- * - That the branch is 'master'
+ * - That the request did indeed come from Shippable (TODO #2)
+ * - That the build id is of the latest build for this project (TODO #2)
+ * - That the branch is matches the pre-configured branch
  *
  * @override
  */

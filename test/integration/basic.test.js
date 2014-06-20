@@ -683,6 +683,129 @@ test['invoke trigger'] = {
   },
 
 
+
+  'ci': {
+
+    before: function(done) {
+      var self = this;
+
+      // create the trigger
+      Q.resolve(self.app.models.Playbook.getByName('normal'))
+        .then(function(playbook) {
+          self.playbook = playbook;
+
+          self.trigger = new self.app.models.Trigger({
+            playbook: self.playbook._id,
+            description: 'test',
+            type: 'ci',
+            configParams: {
+              ci_expected_branch: 'test'
+            }
+          });
+
+          return Q.promisify(self.trigger.save).call(self.trigger);
+        })
+        .nodeify(done);
+    },
+
+    'bad token': function(done) {
+      var self = this;
+
+      self.request.get('/invoke/' + self.trigger._id)
+        .query({
+          token: 'blah'
+        })
+        .expect(200)
+        .then(function() {
+          return utils.waitFor(1000);
+        })
+        .then(function() {
+          return Q.resolve(self.app.models.Job.getForTrigger(self.trigger._id))
+        })
+        .then(function(jobs) {
+          if (!jobs || 0 === jobs.length) throw new Error('Jobs not found');
+
+          var job = jobs[0];
+          job.status.should.eql('failed');
+
+          return Q.resolve(self.app.models.Log.getForJob(job._id));
+        })
+        .then(function(logs) {
+          var log = _.find(logs, function(log) {
+            return 'Incorrect auth token' === log.text;
+          });
+
+          expect(log).to.exist;
+        })
+        .nodeify(done);
+    },
+
+    'wrong branch': function(done) {
+      var self = this;
+
+      self.request.get('/invoke/' + self.trigger._id)
+        .query({
+          token: self.trigger.token,
+          ci_build_branch: 'develop',
+        })
+        .expect(200)
+        .then(function(err) {
+          return utils.waitFor(1000);
+        })
+        .then(function() {
+          return Q.resolve(self.app.models.Job.getForTrigger(self.trigger._id));
+        })        
+        .then(function(jobs) {
+          if (!jobs || 0 === jobs.length) throw new Error('Jobs not found');
+
+          var job = jobs[0];
+          job.status.should.eql('stopped');
+
+          return Q.resolve(self.app.models.Log.getForJob(job._id));
+        })
+        .then(function(logs) {
+          var log = _.find(logs, function(log) {
+            return 'Job stopped: Can only build test branch' === log.text;
+          });
+
+          expect(log).to.exist;
+        })
+        .nodeify(done);              
+    },
+
+    'success': function(done) {
+      var self = this;
+
+      self.request.get('/invoke/' + self.trigger._id)
+        .query({
+          token: self.trigger.token,
+          ci_build_branch: 'test',
+        })
+        .expect(200)
+        .then(function(err) {
+          return utils.waitFor(1000);
+        })
+        .then(function() {
+          return Q.resolve(self.app.models.Job.getForTrigger(self.trigger._id));
+        })        
+        .then(function(jobs) {
+          if (!jobs || 0 === jobs.length) throw new Error('Jobs not found');
+
+          var job = jobs[0];
+          job.status.should.eql('completed');
+
+          job.queryParams.should.eql({
+            token: self.trigger.token,
+            ci_build_branch: 'test'
+          });
+
+          return Q.resolve(self.app.models.Log.getForJob(job._id));
+        })
+        .nodeify(done);              
+    },
+  },
+
+
   'shippable': {
 
     before: function(done) {
@@ -777,8 +900,6 @@ test['invoke trigger'] = {
     'success': function(done) {
       var self = this;
 
-      self.timeout(5000);
-
       self.request.get('/invoke/' + self.trigger._id)
         .query({
           token: self.trigger.token,
@@ -787,7 +908,7 @@ test['invoke trigger'] = {
         })
         .expect(200)
         .then(function(err) {
-          return utils.waitFor(3000);
+          return utils.waitFor(1000);
         })
         .then(function() {
           return Q.resolve(self.app.models.Job.getForTrigger(self.trigger._id));
