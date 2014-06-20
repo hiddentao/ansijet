@@ -11,7 +11,7 @@ or if you simply wish to trigger playbook runs based on other
 events within your system.
 
 Features:
- * Trigger playbook runs [different sources](#triggers), including from Continous Integration systems such as [Shippable](https://www.shippable.com).
+ * Trigger playbook runs from [different sources](#triggers), including from Continous Integration systems such as [Shippable](https://www.shippable.com).
  * Runs multile playbooks simultaneously, all in separate shell processes
  * Fast, friendly web interface with accompanying [REST API](#rest-api)
  * Highly asynchronous, scalable back-end
