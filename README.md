@@ -254,6 +254,7 @@ server {
 Though I am already using Ansibot in a production environment it is very much a 
 work-in-progress. All suggestions and pull requests are welcome! 
 
+See CONTRIBUTING.md for guidelines.
 
 ## License
 
