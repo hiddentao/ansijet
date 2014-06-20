@@ -133,15 +133,6 @@ This exposes a simple URL which triggers a playbook run. It does not
 perform any checks prior to triggering the playbook run. Neither does it supply 
 any Ansible playbook variables.
 
-**Trigger: CI**
-
-This exposes a URL to be called after a successful continuous integration build. 
-It can be configured with a Git branch to execute playbook runs for. 
-It supplies the following Ansible variables:
-
-  * `ci_expected_branch`   <- configured by user
-  * `ci_build_branch`      <- obtained from incoming request
-
 **Trigger: Shippable**
 
 This exposes a URL to be called after a successful [shippable.com](shippable.com) 

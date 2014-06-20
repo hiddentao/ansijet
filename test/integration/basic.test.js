@@ -117,9 +117,9 @@ test['view playbooks'] = {
 
 
 
-test['create simple trigger'] = {
-  before: _testSetup,
-  after: _testTeardown,
+test['create trigger'] = {
+  beforeEach: _testSetup,
+  afterEach: _testTeardown,
 
   'get step1': function(done) {
     var self = this;
@@ -133,48 +133,52 @@ test['create simple trigger'] = {
         expect(form.id).to.eql('addTrigger');
         expect(form.fields).to.exist;
         expect(form.order).to.eql(['description', 'type']);
+
+        _.keys(form.fields.type.options).should.eql(['shippable', 'simple']);
       })
       .nodeify(done);        
   },
-  'post step1': {
-    'description required': function(done) {
-      var self = this;
 
-      self.request.post('/playbooks/normal/addTrigger?format=json')
-        .send({
-          type: 'simple'
-        })
-        .expect(400)
-        .end(done);
+
+  'simple': {
+    'post step1': {
+      'description required': function(done) {
+        var self = this;
+
+        self.request.post('/playbooks/normal/addTrigger?format=json')
+          .send({
+            type: 'simple'
+          })
+          .expect(400)
+          .end(done);
+      },
+      'trigger type required': function(done) {
+        var self = this;
+
+        self.request.post('/playbooks/normal/addTrigger?format=json')
+          .send({
+            description: 'test'
+          })
+          .expect(400)
+          .end(done);
+      },
+      'redirect to step2': function(done) {
+        var self = this;
+
+        self.request.post('/playbooks/normal/addTrigger?format=json')
+          .send({
+            description: 'test',
+            type: 'simple'
+          })
+          .expect('location', '/playbooks/normal/addTrigger/step2')
+          .then(function(res) {
+            expect(res.body).to.eql({});
+            expect(res.headers['set-cookie']).to.exist;
+          })
+          .nodeify(done);
+      }
     },
-    'trigger type required': function(done) {
-      var self = this;
-
-      self.request.post('/playbooks/normal/addTrigger?format=json')
-        .send({
-          description: 'test'
-        })
-        .expect(400)
-        .end(done);
-    },
-    'redirect to step2': function(done) {
-      var self = this;
-
-      self.request.post('/playbooks/normal/addTrigger?format=json')
-        .send({
-          description: 'test',
-          type: 'simple'
-        })
-        .expect('location', '/playbooks/normal/addTrigger/step2')
-        .then(function(res) {
-          expect(res.body).to.eql({});
-          expect(res.headers['set-cookie']).to.exist;
-        })
-        .nodeify(done);
-    }
-  },
-  'post step 2 - created': {
-    'simple trigger': function(done) {
+    'post step 2 - created': function(done) {
       var self = this;
 
       self.request.post('/playbooks/normal/addTrigger?format=json')
@@ -204,11 +208,99 @@ test['create simple trigger'] = {
           expect(triggers[0].description).to.eql('test');
           expect(triggers[0].type).to.eql('simple');
           expect(triggers[0].configParams).to.eql({});
-          expect(triggers[0].ansibleVars).to.eql({});
         })
         .nodeify(done);
-    }      
+    },
   },
+
+
+  'shippable': {
+    'post step1': {
+      'redirect to step2': function(done) {
+        var self = this;
+
+        self.request.post('/playbooks/normal/addTrigger?format=json')
+          .send({
+            description: 'test',
+            type: 'shippable'
+          })
+          .expect('location', '/playbooks/normal/addTrigger/step2')
+          .then(function(res) {
+            expect(res.body).to.eql({});
+            expect(res.headers['set-cookie']).to.exist;
+          })
+          .nodeify(done);
+      }
+    },
+    'post step 2': {
+      'missing config': function(done) {
+        var self = this;
+
+        self.request.post('/playbooks/normal/addTrigger?format=json')
+          .send({
+            description: 'test',
+            type: 'shippable'
+          })
+          .expect(302)
+          .then(function(res){
+            return self.request
+              .post('/playbooks/normal/addTrigger/step2?format=json&')
+              .send({})
+              .expect(400);
+          })
+          .then(function(res) {
+            var json = res.body;
+
+            json.error.type.should.eql('FormValidationError');
+
+            json.error.errors.shippable_project_id.errors.notEmpty.should.exist;
+            json.error.errors.shippable_expected_branch.errors.notEmpty.should.exist;
+          })
+          .nodeify(done);
+      },
+
+      'created': function(done) {
+        var self = this;
+
+        self.request.post('/playbooks/normal/addTrigger?format=json')
+          .send({
+            description: 'test',
+            type: 'shippable'
+          })
+          .expect(302)
+          .then(function(res){
+            return self.request
+              .post('/playbooks/normal/addTrigger/step2?format=json&')
+              .send({
+                shippable_project_id: 'abc',
+                shippable_expected_branch: 'master'
+              })
+              .expect(302);
+          })
+          .then(function(res) {
+            return self.request
+              .get('/playbooks/normal?format=json')
+              .expect(200);
+          })
+          .then(function(res) {
+            var json = res.body;
+
+            var triggers = json.triggers || [];
+            expect(triggers.length).to.eql(1);
+
+            expect(triggers[0].viewUrl).to.eql('/triggers/' + triggers[0]._id);
+            expect(triggers[0].description).to.eql('test');
+            expect(triggers[0].type).to.eql('shippable');
+            expect(triggers[0].configParams).to.eql({
+              shippable_project_id: 'abc',
+              shippable_expected_branch: 'master'
+            });
+          })
+          .nodeify(done);
+      } 
+
+    }
+  }
 };
 
 
@@ -682,128 +774,6 @@ test['invoke trigger'] = {
     },
   },
 
-
-
-  'ci': {
-
-    before: function(done) {
-      var self = this;
-
-      // create the trigger
-      Q.resolve(self.app.models.Playbook.getByName('normal'))
-        .then(function(playbook) {
-          self.playbook = playbook;
-
-          self.trigger = new self.app.models.Trigger({
-            playbook: self.playbook._id,
-            description: 'test',
-            type: 'ci',
-            configParams: {
-              ci_expected_branch: 'test'
-            }
-          });
-
-          return Q.promisify(self.trigger.save).call(self.trigger);
-        })
-        .nodeify(done);
-    },
-
-    'bad token': function(done) {
-      var self = this;
-
-      self.request.get('/invoke/' + self.trigger._id)
-        .query({
-          token: 'blah'
-        })
-        .expect(200)
-        .then(function() {
-          return utils.waitFor(1000);
-        })
-        .then(function() {
-          return Q.resolve(self.app.models.Job.getForTrigger(self.trigger._id))
-        })
-        .then(function(jobs) {
-          if (!jobs || 0 === jobs.length) throw new Error('Jobs not found');
-
-          var job = jobs[0];
-          job.status.should.eql('failed');
-
-          return Q.resolve(self.app.models.Log.getForJob(job._id));
-        })
-        .then(function(logs) {
-          var log = _.find(logs, function(log) {
-            return 'Incorrect auth token' === log.text;
-          });
-
-          expect(log).to.exist;
-        })
-        .nodeify(done);
-    },
-
-    'wrong branch': function(done) {
-      var self = this;
-
-      self.request.get('/invoke/' + self.trigger._id)
-        .query({
-          token: self.trigger.token,
-          ci_build_branch: 'develop',
-        })
-        .expect(200)
-        .then(function(err) {
-          return utils.waitFor(1000);
-        })
-        .then(function() {
-          return Q.resolve(self.app.models.Job.getForTrigger(self.trigger._id));
-        })        
-        .then(function(jobs) {
-          if (!jobs || 0 === jobs.length) throw new Error('Jobs not found');
-
-          var job = jobs[0];
-          job.status.should.eql('stopped');
-
-          return Q.resolve(self.app.models.Log.getForJob(job._id));
-        })
-        .then(function(logs) {
-          var log = _.find(logs, function(log) {
-            return 'Job stopped: Can only build test branch' === log.text;
-          });
-
-          expect(log).to.exist;
-        })
-        .nodeify(done);              
-    },
-
-    'success': function(done) {
-      var self = this;
-
-      self.request.get('/invoke/' + self.trigger._id)
-        .query({
-          token: self.trigger.token,
-          ci_build_branch: 'test',
-        })
-        .expect(200)
-        .then(function(err) {
-          return utils.waitFor(1000);
-        })
-        .then(function() {
-          return Q.resolve(self.app.models.Job.getForTrigger(self.trigger._id));
-        })        
-        .then(function(jobs) {
-          if (!jobs || 0 === jobs.length) throw new Error('Jobs not found');
-
-          var job = jobs[0];
-          job.status.should.eql('completed');
-
-          job.queryParams.should.eql({
-            token: self.trigger.token,
-            ci_build_branch: 'test'
-          });
-
-          return Q.resolve(self.app.models.Log.getForJob(job._id));
-        })
-        .nodeify(done);              
-    },
-  },
 
 
   'shippable': {
