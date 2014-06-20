@@ -26,7 +26,7 @@ exports.view = function*() {
   var trigger = yield this.app.models.Trigger.getOne(triggerId);
 
   if (!trigger) {
-    throw new errors.RuntimeError('Trigger not found');
+    throw new errors.RuntimeError('Trigger not found', 404);
   }
 
   var jobs = yield this.app.models.Job.getForTrigger(triggerId);

@@ -12,7 +12,7 @@ exports.view = function*() {
   var job = yield this.app.models.Job.getOne(jobId);
 
   if (!job) {
-    throw new errors.RuntimeError('Job not found');
+    throw new errors.RuntimeError('Job not found', 404);
   }
 
   var logs = yield this.app.models.Log.getForJob(jobId);

@@ -188,8 +188,7 @@ running playbooks which most probably affect your servers you will likely want t
 protect access to it.
 
 My setup is to have Ansibot placed behind an Nginx front-end 
-server, with SSL enforced on all incoming requests. HTTP Basic Auth is 
-enforced on the web interface but not on the API for invoking triggers:
+server, with SSL and HTTP Basic auth enforced on all incoming requests:
 
 ```
 server {
@@ -230,11 +229,6 @@ server {
     expires 30d;
     add_header Pragma public;
     add_header Cache-Control "public";
-  }
-
-  # Trigger invocation does not need auth
-  location ~* ^/invoke/ {
-    proxy_pass http://127.0.0.1:3000;
   }
 
   # If you want to monitor the status of Ansibot and check that it is running 

@@ -39,6 +39,10 @@ exports.loadPlaybook = function*(next) {
   this.playbook = 
     yield this.app.models.Playbook.getByName(this.request.params.id);
 
+  if (!this.playbook) {
+    throw new errors.RuntimeError('Playbook not found', 404);
+  }
+
   yield next;
 }
 

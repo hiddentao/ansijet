@@ -1,5 +1,6 @@
 var _ = require('lodash'),
   fs = require('fs'),
+  moment = require('moment'),
   Q = require('bluebird'),
   request = require('supertest-as-promised');
 
@@ -75,7 +76,7 @@ test['view playbooks'] = {
       .nodeify(done);        
   },
 
-  'single': function(done) {
+  'view single': function(done) {
     var self = this;
 
     self.request.get('/playbooks/normal?format=json')
@@ -100,12 +101,23 @@ test['view playbooks'] = {
         expect(json.playbooks[0]).to.eql(json.playbook);
       })
       .nodeify(done);        
+  },
+
+  'view invalid': function(done) {
+    var self = this;
+
+    self.request.get('/playbooks/invalid?format=json')
+      .expect(404)
+      .then(function(res) {
+        res.body.msg.should.eql('Playbook not found');
+      })
+      .nodeify(done);        
   }
 };
 
 
 
-test['simple trigger'] = {
+test['create simple trigger'] = {
   before: _testSetup,
   after: _testTeardown,
 
@@ -198,6 +210,386 @@ test['simple trigger'] = {
     }      
   },
 };
+
+
+
+test['dashboard'] = {
+  before: function(done) {
+    var self = this;
+
+    _testSetup.call(self, function(err){
+      if (err) return done(err);
+
+      Q.resolve(self.app.models.Playbook.getByName('normal'))
+        .then(function(playbook) {
+          self.playbook = playbook;
+
+          self.trigger = new self.app.models.Trigger({
+            playbook: self.playbook._id,
+            description: 'test',
+            type: 'simple',
+            configParams: {}
+          });
+
+          self.jobs = [
+            new self.app.models.Job({
+              trigger: self.trigger._id,
+              status: 'processing'
+            }),
+            new self.app.models.Job({
+              trigger: self.trigger._id,
+              status: 'failed'
+            }),
+            new self.app.models.Job({
+              trigger: self.trigger._id,
+              status: 'completed'
+            }),
+            new self.app.models.Job({
+              trigger: self.trigger._id,
+              status: 'created'
+            })
+          ];
+
+          return Q.all([
+            Q.promisify(self.trigger.save).call(self.trigger)
+          ].concat(
+            self.jobs.map(function(j) {
+              Q.promisify(j.save).call(j) 
+            })
+          ));
+        })
+      .nodeify(done);
+    });
+  },
+  after: _testTeardown,
+
+  'view': function(done) {
+    var self = this;
+
+    self.request.get('/?format=json')
+      .expect(200)
+      .then(function(res) {
+        var json = res.body;
+
+        var jobs = json.jobs || [];
+        jobs.length.should.eql(2);
+
+        jobs[0]._id.should.eql(self.jobs[3]._id + '');
+        jobs[0].status.should.eql('created');
+        jobs[0].viewUrl.should.eql('/jobs/' + jobs[0]._id);
+
+        jobs[1]._id.should.eql(self.jobs[0]._id + '');
+        jobs[1].status.should.eql('processing');
+        jobs[1].viewUrl.should.eql('/jobs/' + jobs[1]._id);
+      })
+      .nodeify(done);        
+  }
+};
+
+
+
+test['view trigger'] = {
+  before: function(done) {
+    var self = this;
+
+    _testSetup.call(self, function(err){
+      if (err) return done(err);
+
+      Q.resolve(self.app.models.Playbook.getByName('normal'))
+        .then(function(playbook) {
+          self.playbook = playbook;
+
+          self.trigger = new self.app.models.Trigger({
+            playbook: self.playbook._id,
+            description: 'test',
+            type: 'simple',
+            configParams: {}
+          });
+
+          self.job = new self.app.models.Job({
+            trigger: self.trigger._id,
+            source: '127.0.0.1',
+            status: 'failed',
+            queryParams: {
+              test: 123
+            }
+          });
+
+          return Q.all([
+            Q.promisify(self.trigger.save).call(self.trigger),
+            Q.promisify(self.job.save).call(self.job),
+          ]);
+        })
+      .nodeify(done);
+    });
+  },
+  after: _testTeardown,
+
+  'view': function(done) {
+    var self = this;
+
+    self.request.get('/triggers/' + self.trigger._id + '?format=json')
+      .expect(200)
+      .then(function(res) {
+        var json = res.body;
+
+        var jobs = json.jobs || [];
+        jobs.length.should.eql(1);
+
+        var job = jobs[0];
+        job._id.should.eql(self.job._id + '');
+        job.status.should.eql('failed');
+        job.source.should.eql('127.0.0.1');
+        job.queryParams.should.eql({
+          test: 123
+        });
+        job.viewUrl.should.eql('/jobs/' + job._id);
+
+        var trigger = json.trigger;
+        trigger._id.should.eql(self.trigger._id.toString());
+        trigger.description.should.eql('test');
+        trigger.type.should.eql('simple');
+        trigger.viewUrl.should.eql('/triggers/' + trigger._id);
+        trigger.invokeUrlTemplate.path.should.eql('/invoke/' + trigger._id);
+        trigger.invokeUrlTemplate.queryParams.should.eql({
+          token: {
+            type: 'query',
+            desc: 'Authentication token',
+            value: trigger.token              
+          }
+        });
+      })
+      .nodeify(done);        
+  },
+
+  'delete': function(done) {
+    var self = this;
+
+    self.request.delete('/triggers/' + self.trigger._id + '?format=json')
+      .expect(302)
+      .expect('location', '/playbooks/normal')
+      .then(function(res) {
+        return self.request.get('/triggers/' + self.trigger._id + '?format=json')
+          .expect(404);
+      })
+      .then(function(res) {
+        expect(res.body.msg).to.eql('Trigger not found');
+      })
+      .then(function(res) {
+        return self.request.get('/jobs/' + self.job._id + '?format=json')
+          .expect(404);
+      })
+      .then(function(res) {
+        expect(res.body.msg).to.eql('Job not found');
+      })
+      .nodeify(done);
+  },
+};
+
+
+
+
+test['view job'] = {
+  before: function(done) {
+    var self = this;
+
+    _testSetup.call(self, function(err){
+      if (err) return done(err);
+
+      Q.resolve(self.app.models.Playbook.getByName('normal'))
+        .then(function(playbook) {
+          self.playbook = playbook;
+
+          self.trigger = new self.app.models.Trigger({
+            playbook: self.playbook._id,
+            description: 'test',
+            type: 'simple',
+            configParams: {}
+          });
+
+          self.job = new self.app.models.Job({
+            trigger: self.trigger._id,
+            source: '127.0.0.1',
+            status: 'failed',
+            queryParams: {
+              test: 123
+            }
+          });
+
+          self.job2 = new self.app.models.Job({
+            trigger: self.trigger._id,
+          });
+
+          self.logs = [
+            new self.app.models.Log({
+              job: self.job._id,
+              text: 'a',
+              created_at: moment().add('seconds',1).toDate()
+            }),
+            new self.app.models.Log({
+              job: self.job._id,
+              text: 'b',
+              created_at: moment().add('seconds',2).toDate()
+            }),
+            new self.app.models.Log({
+              job: self.job._id,
+              text: 'c',
+              created_at: moment().add('seconds',3).toDate()
+            }),
+            new self.app.models.Log({
+              job: self.job._id,
+              text: 'd',
+              created_at: moment().add('seconds',4).toDate()
+            }),
+            new self.app.models.Log({
+              job: self.job2._id,
+              text: 'e',
+              created_at: moment().add('seconds',5).toDate()
+            }),
+          ];
+
+          return Q.all([
+            Q.promisify(self.trigger.save).call(self.trigger),
+            Q.promisify(self.job.save).call(self.job),
+            Q.promisify(self.job2.save).call(self.job2),
+          ].concat(
+            self.logs.map(function(j) {
+              Q.promisify(j.save).call(j) 
+            })
+          ));
+        })
+      .nodeify(done);
+    });
+  },
+  after: _testTeardown,
+
+  'view': function(done) {
+    var self = this;
+
+    self.request.get('/jobs/' + self.job._id + '?format=json')
+      .expect(200)
+      .then(function(res) {
+        var json = res.body;
+
+        var job = json.job;
+        job._id.should.eql(self.job._id + '');
+        job.status.should.eql('failed');
+        job.source.should.eql('127.0.0.1');
+        job.queryParams.should.eql({
+          test: 123
+        });
+        job.viewUrl.should.eql('/jobs/' + job._id);
+
+        var logs = json.logs;
+        logs.length.should.eql(4);
+        _.pluck(logs, 'text').should.eql(['d', 'c', 'b', 'a']);
+      })
+      .nodeify(done);        
+  }
+
+};
+
+
+
+
+
+test['view logs'] = {
+  before: function(done) {
+    var self = this;
+
+    _testSetup.call(self, function(err){
+      if (err) return done(err);
+
+      Q.resolve(self.app.models.Playbook.getByName('normal'))
+        .then(function(playbook) {
+          self.playbook = playbook;
+
+          self.trigger = new self.app.models.Trigger({
+            playbook: self.playbook._id,
+          });
+
+          self.jobs = new self.app.models.Job({
+            trigger: self.trigger._id,
+          });
+
+          self.jobs = [
+            new self.app.models.Job({
+              trigger: self.trigger._id,
+            }),
+            new self.app.models.Job({
+              trigger: self.trigger._id,
+            }),
+            new self.app.models.Job({
+              trigger: self.trigger._id,
+            }),
+            new self.app.models.Job({
+              trigger: self.trigger._id,
+            })
+          ];
+
+
+          self.logs = [
+            new self.app.models.Log({
+              job: self.jobs[0]._id,
+              text: 'a',
+              created_at: moment().add('seconds',1).toDate()
+            }),
+            new self.app.models.Log({
+              job: self.jobs[3]._id,
+              text: 'b',
+              created_at: moment().add('seconds',2).toDate()
+            }),
+            new self.app.models.Log({
+              job: self.jobs[2]._id,
+              text: 'c',
+              created_at: moment().add('seconds',3).toDate()
+            }),
+            new self.app.models.Log({
+              job: self.jobs[1]._id,
+              text: 'd',
+              created_at: moment().add('seconds',4).toDate()
+            }),
+            new self.app.models.Log({
+              job: self.jobs[0]._id,
+              text: 'e',
+              created_at: moment().add('seconds',5).toDate()
+            }),
+          ];
+
+          return Q.all([
+            Q.promisify(self.trigger.save).call(self.trigger)
+          ].concat(
+            self.jobs.map(function(j) {
+              Q.promisify(j.save).call(j) 
+            })
+          ).concat(
+            self.logs.map(function(j) {
+              Q.promisify(j.save).call(j) 
+            })
+          ));
+        })
+      .nodeify(done);
+    });
+  },
+  after: _testTeardown,
+
+  'view': function(done) {
+    var self = this;
+
+    self.request.get('/logs?format=json')
+      .expect(200)
+      .then(function(res) {
+        var json = res.body;
+
+        var logs = json.logs;
+        logs.length.should.eql(5);
+        _.pluck(logs, 'text').should.eql(['e', 'd', 'c', 'b', 'a']);
+      })
+      .nodeify(done);        
+  }
+
+};
+
 
 
 
