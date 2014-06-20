@@ -146,17 +146,22 @@ gulp.task('test', function () {
 
 
 
-// The default task (called when you run `gulp` from cli)
-gulp.task('ci', function(cb) {
+gulp.task('build', function(cb) {
   runSequence(
     'clean', 
     'build-frontend', 
     'verify-frontend-build', 
     'build-backend', 
-    'test', 
     cb
   );
 });
 
 
 
+gulp.task('ci', function(cb) {
+  runSequence(
+    'build',
+    'test',
+    cb
+  );
+});

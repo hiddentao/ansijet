@@ -5,8 +5,9 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "ci": "NODE_ENV=test node --harmony `which gulp` ci",
-    "test": "NODE_ENV=test node --harmony `which gulp` test"
+    "build": "NODE_ENV=test node --harmony `which gulp` build",
+    "test": "NODE_ENV=test node --harmony `which gulp` test",
+    "ci": "NODE_ENV=test node --harmony `which gulp` ci"
   },
   "repository": {
     "type": "git",

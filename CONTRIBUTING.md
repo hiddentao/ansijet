@@ -20,3 +20,9 @@ We will only accept a merge requests which meets the following criteria:
 * Contains functionality we think other users will benefit from too
 * Doesn't add unnessecary configuration options since they complicate future changes
 
+## Building and testing the code
+
+$ npm install -g gulp bower
+$ npm install
+$ bower install
+$ npm run build

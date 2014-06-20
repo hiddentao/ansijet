@@ -67,10 +67,10 @@ within the same folder, i.e. at `<playbooks folder>/roles/`. Ditto for
 ```bash
 $ git clone https://github.com/hiddentao/ansibot.git ansibot
 $ cd ansibot
+$ npm install -g gulp bower
 $ npm install
 $ bower install
-$ gulp build
-$ gulp verify_build
+$ npm run build
 ```
 
 Now create `ansibot/src/config/production.js`:
