@@ -20,9 +20,9 @@
         <p class="header">Ansible playbook automation server</p>
 
         <ul>
-          <li class="download"><a class="buttons" href="https://github.com/hiddentao/ansibot/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/hiddentao/ansibot/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/hiddentao/ansibot">View On GitHub</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/hiddentao/ansijet/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/hiddentao/ansijet/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/hiddentao/ansijet">View On GitHub</a></li>
         </ul>
 
         <p class="header">This project is maintained by <a class="header name" href="https://github.com/hiddentao">hiddentao</a></p>
@@ -31,9 +31,9 @@
       </header>
       <section>
         <h1>
-<a name="ansibot" class="anchor" href="#ansibot"><span class="octicon octicon-link"></span></a>Ansibot</h1>
+<a name="ansijet" class="anchor" href="#ansijet"><span class="octicon octicon-link"></span></a>Ansijet</h1>
 
-<p><a href="http://travis-ci.org/hiddentao/ansibot"><img src="https://secure.travis-ci.org/hiddentao/ansibot.png" alt="Build Status"></a></p>
+<p><a href="http://travis-ci.org/hiddentao/ansijet"><img src="https://secure.travis-ci.org/hiddentao/ansijet.png" alt="Build Status"></a></p>
 
 <p>An <a href="http://ansible.com/">Ansible</a> playbook automation server.</p>
 
@@ -66,7 +66,7 @@ using <code>pip</code>, the Python package manager.</p>
 
 <p>Installation instructions: <a href="http://nodejs.org/">http://nodejs.org/</a>. </p>
 
-<p>Ensure the installed version is at least <strong>0.11.2</strong>. Ansibot will not work with 
+<p>Ensure the installed version is at least <strong>0.11.2</strong>. Ansijet will not work with 
 earlier versions.</p>
 
 <p><em>(For Ubuntu users I recommend the <a href="https://launchpad.net/%7Echris-lea/+archive/node.js/">Chris Lea PPA</a>)</em>.</p>
@@ -82,7 +82,7 @@ to connect to a MongoDB server running on <code>127.0.0.1</code> (i.e. <code>loc
 
 <p>Place your Ansible playbooks somewhere, e.g. <code>/playbooks</code>.</p>
 
-<p>Ansibot expects your playbooks folder to have a certain structure:</p>
+<p>Ansijet expects your playbooks folder to have a certain structure:</p>
 
 <pre><code>&lt;playbooks folder&gt;/*.yml   &lt;- your playbooks
 &lt;playbooks folder&gt;/hosts   &lt;- Ansible hosts file
@@ -94,17 +94,17 @@ by your playbooks can be found by the
 within the same folder, i.e. at <code>&lt;playbooks folder&gt;/roles/</code>. Ditto for 
 <code>group_vars</code> and <code>host_vars</code> folders.</p>
 
-<p><strong>Setup Ansibot</strong></p>
+<p><strong>Setup Ansijet</strong></p>
 
-<div class="highlight highlight-bash"><pre><span class="nv">$ </span>git clone https://github.com/hiddentao/ansibot.git ansibot
-<span class="nv">$ </span><span class="nb">cd </span>ansibot
+<div class="highlight highlight-bash"><pre><span class="nv">$ </span>git clone https://github.com/hiddentao/ansijet.git ansijet
+<span class="nv">$ </span><span class="nb">cd </span>ansijet
 <span class="nv">$ </span>npm install -g gulp bower
 <span class="nv">$ </span>npm install
 <span class="nv">$ </span>bower install
 <span class="nv">$ </span>npm run build
 </pre></div>
 
-<p>Now create <code>ansibot/src/config/production.js</code>:</p>
+<p>Now create <code>ansijet/src/config/production.js</code>:</p>
 
 <div class="highlight highlight-javascript"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
   <span class="cm">/** Path to folder containg Ansible playbooks */</span>
@@ -115,13 +115,13 @@ within the same folder, i.e. at <code>&lt;playbooks folder&gt;/roles/</code>. Di
 <span class="p">};</span>
 </pre></div>
 
-<p>If you look inside <code>ansibot/src/config/base.js</code> you will see other 
+<p>If you look inside <code>ansijet/src/config/base.js</code> you will see other 
 configuration settings MongoDB, logging, etc. You may 
 override these too within the <code>config/production.js</code> you created.</p>
 
-<p><strong>Run Ansibot</strong></p>
+<p><strong>Run Ansijet</strong></p>
 
-<div class="highlight highlight-bash"><pre><span class="nv">$ </span><span class="nb">cd </span>ansibot
+<div class="highlight highlight-bash"><pre><span class="nv">$ </span><span class="nb">cd </span>ansijet
 <span class="nv">$ NODE_ENV</span><span class="o">=</span>production ./start-app.js
 </pre></div>
 
@@ -131,8 +131,8 @@ override these too within the <code>config/production.js</code> you created.</p>
 <h2>
 <a name="setup-playbook-automation" class="anchor" href="#setup-playbook-automation"><span class="octicon octicon-link"></span></a>Setup playbook automation</h2>
 
-<p>Once Ansibot is up and running and you can access the web interface you can view 
-the list of Playbooks that Ansibot has found and assign triggers to them.</p>
+<p>Once Ansijet is up and running and you can access the web interface you can view 
+the list of Playbooks that Ansijet has found and assign triggers to them.</p>
 
 <h3>
 <a name="triggers" class="anchor" href="#triggers"><span class="octicon octicon-link"></span></a>Triggers</h3>
@@ -150,9 +150,9 @@ to be configurable based on the incoming request and the trigger configuration.<
 </ol><p>All triggers URLs look like <code>/invoke/&lt;trigger id&gt;?token=&lt;secret token&gt;</code> with 
 additional query parameters depending on the trigger type.</p>
 
-<p><em>Note: The <code>&lt;secret token&gt;</code> is randomly generated by Ansibot when a trigger is created 
+<p><em>Note: The <code>&lt;secret token&gt;</code> is randomly generated by Ansijet when a trigger is created 
 and acts as an additional security check. If the token in an incoming request is 
-incorrect Ansibot does not report this to the URL requester - it simply logs 
+incorrect Ansijet does not report this to the URL requester - it simply logs 
 this fact in the back-end.</em></p>
 
 <p>At present two trigger types are supported:</p>
@@ -178,8 +178,8 @@ to execute playbook runs for. It supplies the following Ansible variables:</p>
 <code>shippable_build_num</code>         &lt;- obtained from incoming request</li>
 <li>
 <code>shippable_build_branch</code>      &lt;- obtained from incoming request</li>
-</ul><p><em>(Future improvement: once <a href="https://github.com/hiddentao/ansibot/issues/2">Shippable build artefacts</a> 
-are publicly accessible Ansibot will be able to supply the build artefacts URL 
+</ul><p><em>(Future improvement: once <a href="https://github.com/hiddentao/ansijet/issues/2">Shippable build artefacts</a> 
+are publicly accessible Ansijet will be able to supply the build artefacts URL 
 to playbooks).</em></p>
 
 <h3>
@@ -187,18 +187,18 @@ to playbooks).</em></p>
 
 <p>When a trigger is invoked it runs a playbook, known as a <em>Job</em>. Jobs are 
 executed in parallel by 
-Ansibot, with the maximum no. of simultaenous jobs determined by the 
-<code>jobsInParallel</code> configuration parameter set during Ansibot installation. 
-Ansibot is also smart enough to ensure that for each playbook, only one instance 
+Ansijet, with the maximum no. of simultaenous jobs determined by the 
+<code>jobsInParallel</code> configuration parameter set during Ansijet installation. 
+Ansijet is also smart enough to ensure that for each playbook, only one instance 
 of it is being run at a time.</p>
 
 <p>Each job - i.e. playbook run - takes place in a separate shell process, allowing 
-Ansibot to be scaled up according to your machine's cores. Ansibot also 
+Ansijet to be scaled up according to your machine's cores. Ansijet also 
 monitors each shell process such that if no output is received for 5 minutes 
 (this time window is configurable) it will kill the shell process 
 and assume the playbook run has failed.</p>
 
-<p>When a job is being processed it shows up as an <em>Active Job</em> on your Ansibot 
+<p>When a job is being processed it shows up as an <em>Active Job</em> on your Ansijet 
 server's homepage. You can click on it to view the current log output, including 
 console log output.</p>
 
@@ -212,20 +212,20 @@ trigger job.</p>
 <h2>
 <a name="rest-api" class="anchor" href="#rest-api"><span class="octicon octicon-link"></span></a>REST API</h2>
 
-<p>Ansibot is built using <a href="http://waigojs.com">Waigo</a>, which means that all the 
+<p>Ansijet is built using <a href="http://waigojs.com">Waigo</a>, which means that all the 
 URL routes automatically have REST API counterparts. For any given URL, you can 
 view REST JSON output by simply appending a <code>format=json</code> query parameter when 
 making the request. This applies to form submissions too. For more information 
 on this <a href="http://waigojs.com/guide.html#views-and-output-formats">see the Waigo docs</a>.</p>
 
 <h2>
-<a name="securing-ansibot" class="anchor" href="#securing-ansibot"><span class="octicon octicon-link"></span></a>Securing Ansibot</h2>
+<a name="securing-ansijet" class="anchor" href="#securing-ansijet"><span class="octicon octicon-link"></span></a>Securing Ansijet</h2>
 
-<p>Ansibot does not come with any sort of authentication out of the box. Since it's 
+<p>Ansijet does not come with any sort of authentication out of the box. Since it's 
 running playbooks which most probably affect your servers you will likely want to 
 protect access to it.</p>
 
-<p>My setup is to have Ansibot placed behind an Nginx front-end 
+<p>My setup is to have Ansijet placed behind an Nginx front-end 
 server, with SSL and HTTP Basic auth enforced on all incoming requests:</p>
 
 <pre><code>server {
@@ -248,7 +248,7 @@ server {
   ssl_prefer_server_ciphers on;
   ssl_ciphers EECDH+ECDSA+AESGCM:EECDH+aRSA+AESGCM:EECDH+ECDSA+SHA256:EECDH+aRSA+RC4:EDH+aRSA:EECDH:RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS;
 
-  root /ansibot/frontend/build;
+  root /ansijet/frontend/build;
 
   location ~ /\. {
     deny all;
@@ -268,8 +268,8 @@ server {
     add_header Cache-Control "public";
   }
 
-  # If you want to monitor the status of Ansibot and check that it is running 
-  # you can call the `/ping` URL. This will output `Ansibot up` is Ansibot is 
+  # If you want to monitor the status of Ansijet and check that it is running 
+  # you can call the `/ping` URL. This will output `Ansijet up` is Ansijet is 
   # running
   location = /ping {
     proxy_pass http://127.0.0.1:3000;
@@ -278,7 +278,7 @@ server {
   # Everything else needs auth
   location / {
     auth_basic on;
-    auth_basic_user_file /ansibot/httpd.auth;
+    auth_basic_user_file /ansijet/httpd.auth;
     proxy_pass http://127.0.0.1:3000;
   }
 
@@ -288,7 +288,7 @@ server {
 <h2>
 <a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
-<p>Though I am already using Ansibot in a production environment it is very much a 
+<p>Though I am already using Ansijet in a production environment it is very much a 
 work-in-progress. All suggestions and pull requests are welcome! </p>
 
 <p>See CONTRIBUTING.md for guidelines.</p>
