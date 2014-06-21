@@ -1,5 +1,7 @@
 # Ansijet
 
+_(formerly known as Ansibot, now renamed to avoid being confused with Github's Ansibot)_
+
 [![Build Status](https://secure.travis-ci.org/hiddentao/ansijet.png)](http://travis-ci.org/hiddentao/ansijet)
 
 An [Ansible](http://ansible.com/) playbook automation server.
