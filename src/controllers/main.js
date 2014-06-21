@@ -12,5 +12,5 @@ exports.index = function*(next) {
 
 
 exports.ping = function*(next) {
-  this.body = 'Ansibot up';
+  this.body = 'Ansijet up';
 };

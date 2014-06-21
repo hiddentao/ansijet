@@ -2,7 +2,7 @@
 
 
 var _ = require('lodash'),
-  debug = require('debug')('ansibot-startup-ansible'),
+  debug = require('debug')('ansijet-startup-ansible'),
   fs = require('then-fs'),
   path = require('path'),
   thunkify = require('thunkify'),

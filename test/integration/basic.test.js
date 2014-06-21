@@ -22,7 +22,7 @@ var _testSetup = function(customConfig, done) {
 
   var self = this;
 
-  utils.startAnsibot(customConfig)
+  utils.startAnsijet(customConfig)
     .then(function(Application) {
       self.app = Application.app;
 
@@ -36,7 +36,7 @@ var _testSetup = function(customConfig, done) {
 
 
 var _testTeardown = function(done) {
-  utils.stopAnsibot()
+  utils.stopAnsijet()
     .then(function() {
       return utils.closeAllDbConnections();
     })
@@ -1114,7 +1114,7 @@ test['job output timeout'] = {
       })
       .then(function(logs) {
         var log = _.find(logs, function(log) {
-          return 'Killed by Ansibot: Output timed out' === log.text;
+          return 'Killed by Ansijet: Output timed out' === log.text;
         });
 
         expect(log).to.exist;

@@ -1,10 +1,10 @@
 # Contributing
 
-This guide guidelines for those wishing to contribute to Ansibot
+This guide guidelines for those wishing to contribute to Ansijet
 
 ## Contributor license agreement
 
-By submitting code as an individual or as an entity you agree that your code is [licensed the same as Ansibot](README.md).
+By submitting code as an individual or as an entity you agree that your code is [licensed the same as Ansijet](README.md).
 
 ## Issues and pull requests
 

@@ -2,7 +2,7 @@
 
 
 
-var debug = require('debug')('ansibot-job-processor'),
+var debug = require('debug')('ansijet-job-processor'),
   co = require('co'),
   path = require('path'),
   thunkify = require('thunkify'),

@@ -30,7 +30,7 @@ module.exports = function(config) {
     mongo: {
       host: '127.0.0.1',
       port: '27017',
-      db: 'ansibot'
+      db: 'ansijet'
     }
   };
 

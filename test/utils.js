@@ -42,7 +42,7 @@ var runGen = exports.runGen = function(genFn, arg1) {
  * @return {Promise}
  */
 exports.resetDb = function() {
-  var url = 'mongodb://127.0.0.1:27017/ansibot-test';
+  var url = 'mongodb://127.0.0.1:27017/ansijet-test';
   var db = mongoose.createConnection(url);
 
   var promise = new Q(function(resolve, reject) {
@@ -72,7 +72,7 @@ exports.resetDb = function() {
 
 
 /** 
- * Start Ansibot server to test against.
+ * Start Ansijet server to test against.
  *
  * This will call `resetDb` before starting the server.
  *
@@ -80,7 +80,7 @@ exports.resetDb = function() {
  * 
  * @return {Promise}
  */
-exports.startAnsibot = function(customConfig) {
+exports.startAnsijet = function(customConfig) {
   return runGen(function*() {
     yield exports.resetDb();
 
@@ -104,7 +104,7 @@ exports.startAnsibot = function(customConfig) {
           mongo: {
             host: '127.0.0.1',
             port: '27017',
-            db: 'ansibot-test'
+            db: 'ansijet-test'
           }
         };
 
@@ -122,11 +122,11 @@ exports.startAnsibot = function(customConfig) {
 
 
 /** 
- * Stop Ansibot server to test against.
+ * Stop Ansijet server to test against.
  *
  * @return {Promise}
  */
-exports.stopAnsibot = function() {
+exports.stopAnsijet = function() {
   return runGen(function*() {
     yield exports.resetDb();
     var Application = waigo.load('application');

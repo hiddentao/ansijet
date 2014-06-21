@@ -133,7 +133,7 @@ Exec.prototype._onError = function(defer) {
 
     if (self._killReason) {
       err.exitCode = null;
-      err.message = 'Killed by Ansibot: ' + self._killReason;
+      err.message = 'Killed by Ansijet: ' + self._killReason;
     } else {
       err.exitCode = err.code || -1;
     }
