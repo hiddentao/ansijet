@@ -48,7 +48,7 @@ events within your system.</p>
 <p>Features:</p>
 
 <ul>
-<li>Trigger playbook runs from <a href="#triggers">different sources</a>, including from Continous Integration systems such as <a href="https://www.shippable.com">Shippable</a>.</li>
+<li>Trigger playbook runs from <a href="#triggers">different sources</a>, including from CI systems such as <a href="https://github.com/drone/drone">Drone</a>.</li>
 <li>Runs multile playbooks simultaneously, all in separate shell processes</li>
 <li>Fast, friendly web interface with accompanying <a href="#rest-api">REST API</a>
 </li>
@@ -165,26 +165,19 @@ this fact in the back-end.</em></p>
 perform any checks prior to triggering the playbook run. Neither does it supply 
 any Ansible playbook variables.</p>
 
-<p><strong>Trigger: Shippable</strong></p>
+<p><strong>Trigger: Drone</strong></p>
 
-<p>This exposes a URL to be called after a successful <a href="shippable.com">shippable.com</a> 
-CI build. It can be configured with a Shippable project id and a Git branch 
-to execute playbook runs for. It supplies the following Ansible variables:</p>
+<p>This exposes a URL to be called after a successful <a href="https://github.com/drone/drone">Drone</a> 
+build. It supplies the following Ansible variables:</p>
 
 <ul>
 <li>
-<code>shippable_project_id</code>        &lt;- configured by user</li>
+<code>ci_expected_branch</code>   &lt;- Git branch to run playbook for, configured by user</li>
 <li>
-<code>shippable_expected_branch</code>   &lt;- configured by user</li>
+<code>ci_build_commit</code>      &lt;- Git commit id, obtained from incoming request</li>
 <li>
-<code>shippable_build_num</code>         &lt;- obtained from incoming request</li>
-<li>
-<code>shippable_build_branch</code>      &lt;- obtained from incoming request</li>
-</ul><p><em>(Future improvement: once <a href="https://github.com/hiddentao/ansijet/issues/2">Shippable build artefacts</a> 
-are publicly accessible Ansijet will be able to supply the build artefacts URL 
-to playbooks).</em></p>
-
-<h3>
+<code>ci_build_branch</code>      &lt;- Git branch built, obtained from incoming request</li>
+</ul><h3>
 <a name="jobs" class="anchor" href="#jobs"><span class="octicon octicon-link"></span></a>Jobs</h3>
 
 <p>When a trigger is invoked it runs a playbook, known as a <em>Job</em>. Jobs are 
