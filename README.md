@@ -13,7 +13,7 @@ or if you simply wish to trigger playbook runs based on other
 events within your system.
 
 Features:
- * Trigger playbook runs from [different sources](#triggers), including from Continous Integration systems such as [Shippable](https://www.shippable.com).
+ * Trigger playbook runs from [different sources](#triggers), including from CI systems such as [Drone](https://github.com/drone/drone).
  * Runs multile playbooks simultaneously, all in separate shell processes
  * Fast, friendly web interface with accompanying [REST API](#rest-api)
  * Highly asynchronous, scalable back-end
@@ -135,20 +135,14 @@ This exposes a simple URL which triggers a playbook run. It does not
 perform any checks prior to triggering the playbook run. Neither does it supply 
 any Ansible playbook variables.
 
-**Trigger: Shippable**
+**Trigger: Drone**
 
-This exposes a URL to be called after a successful [shippable.com](shippable.com) 
-CI build. It can be configured with a Shippable project id and a Git branch 
-to execute playbook runs for. It supplies the following Ansible variables:
+This exposes a URL to be called after a successful [Drone](https://github.com/drone/drone) 
+build. It supplies the following Ansible variables:
 
-  * `shippable_project_id`        <- configured by user
-  * `shippable_expected_branch`   <- configured by user
-  * `shippable_build_num`         <- obtained from incoming request
-  * `shippable_build_branch`      <- obtained from incoming request
-
-_(Future improvement: once [Shippable build artefacts](https://github.com/hiddentao/ansijet/issues/2) 
-are publicly accessible Ansijet will be able to supply the build artefacts URL 
-to playbooks)._
+  * `ci_expected_branch`   <- Git branch to run playbook for, configured by user
+  * `ci_build_commit`      <- Git commit id, obtained from incoming request
+  * `ci_build_branch`      <- Git branch built, obtained from incoming request
 
 
 ### Jobs

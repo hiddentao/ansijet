@@ -134,7 +134,7 @@ test['create trigger'] = {
         expect(form.fields).to.exist;
         expect(form.order).to.eql(['description', 'type']);
 
-        _.keys(form.fields.type.options).should.eql(['shippable', 'simple']);
+        _.keys(form.fields.type.options).should.eql(['drone', 'simple']);
       })
       .nodeify(done);        
   },
@@ -214,7 +214,7 @@ test['create trigger'] = {
   },
 
 
-  'shippable': {
+  'drone': {
     'post step1': {
       'redirect to step2': function(done) {
         var self = this;
@@ -222,7 +222,7 @@ test['create trigger'] = {
         self.request.post('/playbooks/normal/addTrigger?format=json')
           .send({
             description: 'test',
-            type: 'shippable'
+            type: 'drone'
           })
           .expect('location', '/playbooks/normal/addTrigger/step2')
           .then(function(res) {
@@ -239,7 +239,7 @@ test['create trigger'] = {
         self.request.post('/playbooks/normal/addTrigger?format=json')
           .send({
             description: 'test',
-            type: 'shippable'
+            type: 'drone'
           })
           .expect(302)
           .then(function(res){
@@ -253,8 +253,7 @@ test['create trigger'] = {
 
             json.error.type.should.eql('FormValidationError');
 
-            json.error.errors.shippable_project_id.errors.notEmpty.should.exist;
-            json.error.errors.shippable_expected_branch.errors.notEmpty.should.exist;
+            json.error.errors.ci_expected_branch.errors.notEmpty.should.exist;
           })
           .nodeify(done);
       },
@@ -265,15 +264,14 @@ test['create trigger'] = {
         self.request.post('/playbooks/normal/addTrigger?format=json')
           .send({
             description: 'test',
-            type: 'shippable'
+            type: 'drone'
           })
           .expect(302)
           .then(function(res){
             return self.request
               .post('/playbooks/normal/addTrigger/step2?format=json&')
               .send({
-                shippable_project_id: 'abc',
-                shippable_expected_branch: 'master'
+                ci_expected_branch: 'master'
               })
               .expect(302);
           })
@@ -290,10 +288,9 @@ test['create trigger'] = {
 
             expect(triggers[0].viewUrl).to.eql('/triggers/' + triggers[0]._id);
             expect(triggers[0].description).to.eql('test');
-            expect(triggers[0].type).to.eql('shippable');
+            expect(triggers[0].type).to.eql('drone');
             expect(triggers[0].configParams).to.eql({
-              shippable_project_id: 'abc',
-              shippable_expected_branch: 'master'
+              ci_expected_branch: 'master'
             });
           })
           .nodeify(done);
@@ -776,7 +773,7 @@ test['invoke trigger'] = {
 
 
 
-  'shippable': {
+  'drone': {
 
     before: function(done) {
       var self = this;
@@ -789,10 +786,9 @@ test['invoke trigger'] = {
           self.trigger = new self.app.models.Trigger({
             playbook: self.playbook._id,
             description: 'test',
-            type: 'shippable',
+            type: 'drone',
             configParams: {
-              shippable_project_id: 'test',
-              shippable_expected_branch: 'test'
+              ci_expected_branch: 'test'
             }
           });
 
@@ -839,8 +835,8 @@ test['invoke trigger'] = {
       self.request.get('/invoke/' + self.trigger._id)
         .query({
           token: self.trigger.token,
-          shippable_build_branch: 'develop',
-          shippable_build_num: 12
+          ci_build_branch: 'develop',
+          ci_build_commit: 12
         })
         .expect(200)
         .then(function(err) {
@@ -873,8 +869,8 @@ test['invoke trigger'] = {
       self.request.get('/invoke/' + self.trigger._id)
         .query({
           token: self.trigger.token,
-          shippable_build_branch: 'test',
-          shippable_build_num: 12
+          ci_build_branch: 'test',
+          ci_build_commit: 12
         })
         .expect(200)
         .then(function(err) {
@@ -891,8 +887,8 @@ test['invoke trigger'] = {
 
           job.queryParams.should.eql({
             token: self.trigger.token,
-            shippable_build_num: '12',
-            shippable_build_branch: 'test'
+            ci_build_branch: 'test',
+            ci_build_commit: "12"
           });
 
           return Q.resolve(self.app.models.Log.getForJob(job._id));
