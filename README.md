@@ -185,7 +185,8 @@ on this [see the Waigo docs](http://waigojs.com/guide.html#views-and-output-form
 
 ## HipChat
 
-Ansijet can be configured to notifications to a [HipChat](https://hipchat.com) room using the 
+Ansijet can be configured to send notifications to a 
+[HipChat](https://hipchat.com) room using the 
 [`send_room_notification`](https://www.hipchat.com/docs/apiv2/method/send_room_notification) API.
 
 Simply add the room id and auth token to your configuration file:
