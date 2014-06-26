@@ -34,8 +34,7 @@ jobSchema.method('_save', function*() {
  * @param {Object} req Request context.
  */
 jobSchema.method('execute', function*() {
-  this.status = 'processing';
-  yield this._save();
+  yield this.setState('processing');
 
   yield this.log('Triggered from ' + this.source, {
     data: this.queryParams
@@ -72,8 +71,7 @@ jobSchema.method('execute', function*() {
 
       yield this.log('Job stopped: ' + processingResult.msg, { warning: true });
 
-      this.status = 'stopped';
-
+      yield this.setState('stopped');
     } else {
       var buildVariables = processingResult.ansibleVars || {};
 
@@ -89,7 +87,7 @@ jobSchema.method('execute', function*() {
       var cmd = [ 
         app.config.ansiblePlaybookBin,
         '-vv',
-        '-i ' + path.join(app.config.ansiblePlaybooks, 'hosts'),
+        '-i ' + path.join(app.config.playbooks, 'hosts'),
         '--extra-vars=' + extraVars.join(','),
         playbook.path
       ].join(' ');
@@ -105,7 +103,7 @@ jobSchema.method('execute', function*() {
 
       yield this.log('Job complete');
 
-      this.status = 'completed';
+      yield this.setState('completed');
     }
   } catch (err) {
     if (err.exitCode) {
@@ -116,9 +114,8 @@ jobSchema.method('execute', function*() {
     }
 
     yield this.log('Job failed');
-    this.status = 'failed';
-  } finally {
-    yield this._save();
+
+    yield this.setState('failed');
   }
 });
 
@@ -153,13 +150,19 @@ jobSchema.method('log', function*(message, meta) {
 
 
 /**
- * Send a notification regarding job status.
+ * Set job state and send a notification about it.
  */
-jobSchema.method('notify', function*() {
+jobSchema.method('setState', function*(state) {
+  var app = waigo.load('application').app;
+
+  this.status = state;
+  yield this._save();
+
   var trigger = yield app.models.Trigger.getOne(this.trigger);
   var playbook = yield app.models.Playbook.getOne(trigger.playbook);
 
-  var str = '[JOB ' + this.status.toUpperCase() + '] Ansijet ' + this._id
+  var str = '[JOB ' + this.status.toUpperCase() + '] Ansijet ' 
+      + '<a href="' + app.config.baseURL + this.viewUrl + '">' + this._id + '</a> '
       + '(' + trigger.description + ', ' + playbook.name + ')';
 
   var msgType = 'info';
@@ -173,7 +176,7 @@ jobSchema.method('notify', function*() {
       break;
   }
 
-  app.notify(str, msgType);
+  yield app.notify(str, msgType);
 });
 
 

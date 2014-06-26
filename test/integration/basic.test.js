@@ -58,19 +58,19 @@ test['view playbooks'] = {
       .then(function(res) {
         var json = res.body;
 
-        expect(json.playbook_path).to.eql(self.app.config.ansiblePlaybooks);
+        expect(json.playbook_path).to.eql(self.app.config.playbooks);
         expect(json.playbooks.length).to.eql(2);
 
         var item1 = json.playbooks[0];
         expect(item1._id).to.exist;
         expect(item1.name).to.eql('normal');
-        expect(item1.path).to.eql(self.app.config.ansiblePlaybooks + '/normal.yml');
+        expect(item1.path).to.eql(self.app.config.playbooks + '/normal.yml');
         expect(item1.viewUrl).to.eql('/playbooks/' + item1.name);
 
         var item2 = json.playbooks[1];
         expect(item2._id).to.exist;
         expect(item2.name).to.eql('pause');
-        expect(item2.path).to.eql(self.app.config.ansiblePlaybooks + '/pause.yml');
+        expect(item2.path).to.eql(self.app.config.playbooks + '/pause.yml');
         expect(item2.viewUrl).to.eql('/playbooks/' + item2.name);
       })
       .nodeify(done);        
@@ -86,14 +86,14 @@ test['view playbooks'] = {
 
         expect(json.selectedPlaybookId).to.eql('normal');
         expect(json.triggers).to.eql([]);
-        expect(json.code).to.eql(fs.readFileSync(self.app.config.ansiblePlaybooks + '/normal.yml', {
+        expect(json.code).to.eql(fs.readFileSync(self.app.config.playbooks + '/normal.yml', {
           encoding: 'utf8'
         }));
 
         json.playbook = json.playbook || {};
         expect(json.playbook._id).to.exist;
         expect(json.playbook.name).to.eql('normal');
-        expect(json.playbook.path).to.eql(self.app.config.ansiblePlaybooks + '/normal.yml');
+        expect(json.playbook.path).to.eql(self.app.config.playbooks + '/normal.yml');
         expect(json.playbook.viewUrl).to.eql('/playbooks/normal');
 
         json.playbooks = json.playbooks || [];

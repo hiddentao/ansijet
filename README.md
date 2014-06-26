@@ -18,6 +18,7 @@ Features:
  * Fast, friendly web interface with accompanying [REST API](#rest-api)
  * Highly asynchronous, scalable back-end
  * Full console [log capture](#execution-logs) and storage
+ * Get notified of job status through [HipChat](#hipchat)
  
 
 
@@ -181,6 +182,27 @@ view REST JSON output by simply appending a `format=json` query parameter when
 making the request. This applies to form submissions too. For more information 
 on this [see the Waigo docs](http://waigojs.com/guide.html#views-and-output-formats).
 
+
+## HipChat
+
+Ansijet can be configured to notifications to a [HipChat](https://hipchat.com) room using the 
+[`send_room_notification`](https://www.hipchat.com/docs/apiv2/method/send_room_notification) API.
+
+Simply add the room id and auth token to your configuration file:
+
+```javascript
+module.exports = function(config) {
+  ...
+  config.notifications.hipChat = {
+    roomId: <room id>,
+    authToken: <auth token for room>
+  };
+  ...
+};
+```
+
+When Ansijet first starts up it will send a notification. Subsequent 
+notifications will get sent for every job which gets processed.
 
 
 ## Securing Ansijet

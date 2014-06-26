@@ -98,7 +98,7 @@ exports.startAnsijet = function(customConfig) {
 
         config.baseURL = 'http://localhost:' + config.port;
 
-        config.ansiblePlaybooks = path.join(__dirname, 'data', 'playbooks');
+        config.playbooks = path.join(__dirname, 'data', 'playbooks');
 
         config.db = {
           mongo: {
