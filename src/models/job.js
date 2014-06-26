@@ -56,7 +56,7 @@ jobSchema.method('execute', function*() {
     var triggerType = new app.triggerTypes[trigger.type]();
 
     // playbook
-    var playbook = yield app.models.Playbook.getOne(this.trigger.playbook);
+    var playbook = yield app.models.Playbook.getOne(trigger.playbook);
     if (!playbook) {
       throw new Error('Playbook not found');
     }
@@ -150,6 +150,32 @@ jobSchema.method('log', function*(message, meta) {
 
   yield thunkify(log.save).call(log);
 });
+
+
+/**
+ * Send a notification regarding job status.
+ */
+jobSchema.method('notify', function*() {
+  var trigger = yield app.models.Trigger.getOne(this.trigger);
+  var playbook = yield app.models.Playbook.getOne(trigger.playbook);
+
+  var str = '[JOB ' + this.status.toUpperCase() + '] Ansijet ' + this._id
+      + '(' + trigger.description + ', ' + playbook.name + ')';
+
+  var msgType = 'info';
+
+  switch (this.status) {
+    case 'failed':
+      msgType = 'error';
+      break;
+    case 'completed':
+      msgType = 'success';
+      break;
+  }
+
+  app.notify(str, msgType);
+});
+
 
 
 /**

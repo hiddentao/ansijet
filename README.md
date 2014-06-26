@@ -80,7 +80,7 @@ Now create `ansijet/src/config/production.js`:
 ```javascript
 module.exports = function(config) {
   /** Path to folder containg Ansible playbooks */
-  config.ansiblePlaybooks = '/playbooks'
+  config.playbooks = '/playbooks'
 
   /** Max no. of jobs to execute in parallel. Should match no. of CPU cores. */
   config.jobsInParallel = 1;

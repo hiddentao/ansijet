@@ -30,7 +30,7 @@ module.exports = function*(app) {
 
   debug('Loading Ansible playbooks');
 
-  var files = yield fs.readdir(app.config.ansiblePlaybooks);
+  var files = yield fs.readdir(app.config.playbooks);
 
   for (var i = 0; files.length > i; ++i) {
     var file = files[i];
@@ -48,7 +48,7 @@ module.exports = function*(app) {
 
         obj = new app.models.Playbook({
           name: name,
-          path: path.join(app.config.ansiblePlaybooks, file)
+          path: path.join(app.config.playbooks, file)
         });        
 
         yield thunkify(obj.save).call(obj);
