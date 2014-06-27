@@ -36,7 +36,10 @@ var paths = {
   jsAppFilesWatch: './frontend/src/js/**/*.js',
   jsBuildFolder: './frontend/build/js',
 
-  testFiles: './test/integration/*.test.js'
+  testFiles: [
+    './test/integration/**/*.test.js',
+    './test/unit/**/*.test.js',
+  ]
 };
 
 

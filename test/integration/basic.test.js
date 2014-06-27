@@ -1133,11 +1133,11 @@ test['job output timeout'] = {
 
 
 test['hipchat notifications'] = {
-  before: function(done) {
+  beforeEach: function(done) {
     var self = this;
 
     // mock the hipchat notifier
-    var HipChat = require(path.join(__dirname, '..', '..', 'src', 'support', 'notifications', 'hipChat'));
+    var HipChat = require(path.join(utils.appFolder, 'support', 'notifications', 'hipChat'));
     self.notifyStub = mocker.stub(HipChat.prototype, 'notify').returns(Q.resolve());
 
     _testSetup.call(self, {
@@ -1187,7 +1187,7 @@ test['hipchat notifications'] = {
     );
   },
 
-  'job notifications': function(done) {
+  'job success notifications': function(done) {
     var self = this;
 
     self.timeout(5000);
@@ -1222,7 +1222,45 @@ test['hipchat notifications'] = {
         );
       })
       .nodeify(done);
+  },
+
+  'job failure notifications': function(done) {
+    var self = this;
+
+    self.timeout(5000);
+
+    self.request.get('/invoke/' + self.triggerA1._id + '?token=blast')
+      .expect(200)
+      .then(function() {
+        return utils.waitFor(3000);
+      })
+      .then(function() {
+        return Q.resolve(
+          self.app.models.Job.getForTrigger(self.triggerA1._id)
+        );
+      })        
+      .then(function(jobs) {
+        if (!jobs || 0 === jobs.length) throw new Error('Jobs not found');
+
+        var job = jobs[0];
+
+        expect(job.status).to.eql('failed');
+
+        // check mock
+        self.notifyStub.should.have.been.calledThrice;
+        var viewUrl = self.app.config.baseURL + job.viewUrl;
+        self.notifyStub.should.have.been.calledWithExactly(
+          '[JOB PROCESSING] Ansijet <a href="' + viewUrl + '">' + job._id + '</a> (test p1 t1, normal)', 
+          'info'
+        );
+        self.notifyStub.should.have.been.calledWithExactly(
+          '[JOB FAILED] Ansijet <a href="' + viewUrl + '">' + job._id + '</a> (test p1 t1, normal)', 
+          'error'
+        );
+      })
+      .nodeify(done);
   }
+
 };
 
 
