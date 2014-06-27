@@ -49,11 +49,13 @@ events within your system.</p>
 
 <ul>
 <li>Trigger playbook runs from <a href="#triggers">different sources</a>, including from CI systems such as <a href="https://github.com/drone/drone">Drone</a>.</li>
-<li>Runs multile playbooks simultaneously, all in separate shell processes</li>
+<li>Run multiple playbooks in parallel, all in separate processes</li>
 <li>Fast, friendly web interface with accompanying <a href="#rest-api">REST API</a>
 </li>
 <li>Highly asynchronous, scalable back-end</li>
 <li>Full console <a href="#execution-logs">log capture</a> and storage</li>
+<li>Sends notifications of job status through <a href="#hipchat">HipChat</a>
+</li>
 </ul><h2>
 <a name="installation-and-startup" class="anchor" href="#installation-and-startup"><span class="octicon octicon-link"></span></a>Installation and startup</h2>
 
@@ -108,9 +110,11 @@ within the same folder, i.e. at <code>&lt;playbooks folder&gt;/roles/</code>. Di
 
 <p>Now create <code>ansijet/src/config/production.js</code>:</p>
 
-<div class="highlight highlight-javascript"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
+<div class="highlight highlight-javascript"><pre><span class="s2">"use strict"</span><span class="p">;</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
   <span class="cm">/** Path to folder containg Ansible playbooks */</span>
-  <span class="nx">config</span><span class="p">.</span><span class="nx">ansiblePlaybooks</span> <span class="o">=</span> <span class="s1">'/playbooks'</span>
+  <span class="nx">config</span><span class="p">.</span><span class="nx">playbooks</span> <span class="o">=</span> <span class="s1">'/playbooks'</span>
 
   <span class="cm">/** Max no. of jobs to execute in parallel. Should match no. of CPU cores. */</span>
   <span class="nx">config</span><span class="p">.</span><span class="nx">jobsInParallel</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -212,6 +216,28 @@ URL routes automatically have REST API counterparts. For any given URL, you can
 view REST JSON output by simply appending a <code>format=json</code> query parameter when 
 making the request. This applies to form submissions too. For more information 
 on this <a href="http://waigojs.com/guide.html#views-and-output-formats">see the Waigo docs</a>.</p>
+
+<h2>
+<a name="hipchat" class="anchor" href="#hipchat"><span class="octicon octicon-link"></span></a>HipChat</h2>
+
+<p>Ansijet can be configured to send notifications to a 
+<a href="https://hipchat.com">HipChat</a> room using the 
+<a href="https://www.hipchat.com/docs/apiv2/method/send_room_notification"><code>send_room_notification</code></a> API.</p>
+
+<p>Simply add the room id and auth token to your configuration file:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">...</span>
+  <span class="nx">config</span><span class="p">.</span><span class="nx">notifications</span><span class="p">.</span><span class="nx">hipChat</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">roomId</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">room</span> <span class="nx">id</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">authToken</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">auth</span> <span class="nx">token</span> <span class="k">for</span> <span class="nx">room</span><span class="o">&gt;</span>
+  <span class="p">};</span>
+  <span class="p">...</span>
+<span class="p">};</span>
+</pre></div>
+
+<p>When Ansijet first starts up it will send a notification. Subsequent 
+notifications will get sent for every job which gets processed.</p>
 
 <h2>
 <a name="securing-ansijet" class="anchor" href="#securing-ansijet"><span class="octicon octicon-link"></span></a>Securing Ansijet</h2>
