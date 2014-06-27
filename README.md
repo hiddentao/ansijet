@@ -78,6 +78,8 @@ $ npm run build
 Now create `ansijet/src/config/production.js`:
 
 ```javascript
+"use strict";
+
 module.exports = function(config) {
   /** Path to folder containg Ansible playbooks */
   config.playbooks = '/playbooks'
