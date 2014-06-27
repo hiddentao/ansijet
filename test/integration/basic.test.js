@@ -1,6 +1,7 @@
 var _ = require('lodash'),
   fs = require('fs'),
   moment = require('moment'),
+  path = require('path'),
   Q = require('bluebird'),
   request = require('supertest-as-promised');
 
@@ -8,10 +9,20 @@ var _ = require('lodash'),
 var utils = require('../utils'),
   assert = utils.assert,
   expect = utils.expect,
-  should = utils.should;
+  should = utils.should,
+  sinon = utils.sinon;
 
 
-var test = module.exports = {};
+var mocker;
+
+var test = module.exports = {
+  beforeEach: function() {
+    mocker = sinon.sandbox.create();
+  },
+  afterEach: function() {
+    mocker.restore();
+  }
+};
 
 
 var _testSetup = function(customConfig, done) {
@@ -1117,6 +1128,101 @@ test['job output timeout'] = {
       })
       .nodeify(done);              
   },
+};
+
+
+
+test['hipchat notifications'] = {
+  before: function(done) {
+    var self = this;
+
+    // mock the hipchat notifier
+    var HipChat = require(path.join(__dirname, '..', '..', 'src', 'support', 'notifications', 'hipChat'));
+    self.notifyStub = mocker.stub(HipChat.prototype, 'notify').returns(Q.resolve());
+
+    _testSetup.call(self, {
+      notifications: {
+        hipChat: {
+          roomId: 'test1',
+          authToken: 'test2',
+        }
+      }
+    }, function(err) {
+      if (err) return done(err);
+
+      // create triggers
+      Q.resolve(self.app.models.Playbook.getByName('normal'))
+        .then(function(playbook) {
+          self.playbookA = playbook;
+
+          self.triggerA1 = new self.app.models.Trigger({
+            playbook: self.playbookA._id,
+            description: 'test p1 t1',
+            type: 'simple',
+            configParams: {}
+          });
+
+          return Q.all([
+            Q.promisify(self.triggerA1.save).call(self.triggerA1),
+          ]);
+        })
+        .nodeify(done);      
+    });
+  },
+
+  after: _testTeardown,
+
+
+  afterEach: function(done) {
+    this.app.models.Job.remove(done);
+  },
+
+  'startup notification': function() {
+    var self = this;
+
+    self.notifyStub.should.have.been.calledOnce;
+    self.notifyStub.should.have.been.calledWithExactly(
+      '[STARTED] Ansijet (' + require('os').hostname() + ') m=' + self.app.config.mode,
+      undefined
+    );
+  },
+
+  'job notifications': function(done) {
+    var self = this;
+
+    self.timeout(5000);
+
+    self.request.get('/invoke/' + self.triggerA1._id + '?token=' + self.triggerA1.token)
+      .expect(200)
+      .then(function() {
+        return utils.waitFor(3000);
+      })
+      .then(function() {
+        return Q.resolve(
+          self.app.models.Job.getForTrigger(self.triggerA1._id)
+        );
+      })        
+      .then(function(jobs) {
+        if (!jobs || 0 === jobs.length) throw new Error('Jobs not found');
+
+        var job = jobs[0];
+
+        expect(job.status).to.eql('completed');
+
+        // check mock
+        self.notifyStub.should.have.been.calledThrice;
+        var viewUrl = self.app.config.baseURL + job.viewUrl;
+        self.notifyStub.should.have.been.calledWithExactly(
+          '[JOB PROCESSING] Ansijet <a href="' + viewUrl + '">' + job._id + '</a> (test p1 t1, normal)', 
+          'info'
+        );
+        self.notifyStub.should.have.been.calledWithExactly(
+          '[JOB COMPLETED] Ansijet <a href="' + viewUrl + '">' + job._id + '</a> (test p1 t1, normal)', 
+          'success'
+        );
+      })
+      .nodeify(done);
+  }
 };
 
 

@@ -14,13 +14,12 @@ events within your system.
 
 Features:
  * Trigger playbook runs from [different sources](#triggers), including from CI systems such as [Drone](https://github.com/drone/drone).
- * Runs multile playbooks simultaneously, all in separate shell processes
+ * Run multiple playbooks in parallel, all in separate processes
  * Fast, friendly web interface with accompanying [REST API](#rest-api)
  * Highly asynchronous, scalable back-end
  * Full console [log capture](#execution-logs) and storage
- * Get notified of job status through [HipChat](#hipchat)
+ * Sends notifications of job status through [HipChat](#hipchat)
  
-
 
 ## Installation and startup
 

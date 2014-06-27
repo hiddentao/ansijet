@@ -7,14 +7,19 @@ var _ = require('lodash'),
   mongoose = require('mongoose'),
   path = require('path'),
   Q = require('bluebird'),
+  sinon = require('sinon'),
   waigo = require('waigo');
 
 
 exports.appFolder = path.join(__dirname, '..', 'src');
 
+chai.use(require('sinon-chai'));
+
 exports.assert = chai.assert;
 exports.expect = chai.expect;
 exports.should = chai.should();
+
+exports.sinon = sinon;
 
 
 /** 
