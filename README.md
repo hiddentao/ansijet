@@ -43,7 +43,7 @@ _(For Ubuntu users I recommend the [Chris Lea PPA](https://launchpad.net/~chris-
 
 Installation instructions: 
 
-Ansible stores its data in MongoDB. The default configuration expects to be able 
+Ansijet stores its data in MongoDB. The default configuration expects to be able 
 to connect to a MongoDB server running on `127.0.0.1` (i.e. `localhost`).
 
 **Setup your Ansible playbooks**
