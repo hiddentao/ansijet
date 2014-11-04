@@ -372,16 +372,11 @@ test['dashboard'] = {
         var json = res.body;
 
         var jobs = json.jobs || [];
-        console.log(jobs);
         jobs.length.should.eql(2);
 
-        jobs[0]._id.should.eql(self.jobs[3]._id + '');
-        jobs[0].status.should.eql('created');
-        jobs[0].viewUrl.should.eql('/jobs/' + jobs[0]._id);
-
-        jobs[1]._id.should.eql(self.jobs[0]._id + '');
-        jobs[1].status.should.eql('processing');
-        jobs[1].viewUrl.should.eql('/jobs/' + jobs[1]._id);
+        _.difference(_.pluck(jobs, '_id'), [self.jobs[3]._id + '', self.jobs[0]._id + '']).should.eql([]);
+        _.difference(_.pluck(jobs, 'status'), ['created', 'processing']).should.eql([]);
+        _.difference(_.pluck(jobs, 'viewUrl'), ['/jobs/' + self.jobs[0]._id, '/jobs/' + self.jobs[3]._id]).should.eql([]);
       })
       .nodeify(done);        
   }
