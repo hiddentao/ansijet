@@ -3,7 +3,7 @@ var gulp = require('gulp'),
 
 // require('gulp-grunt')(gulp); // add all the gruntfile tasks to gulp
 
-var clean = require('gulp-clean');
+var del = require('del');
 var concat = require('gulp-concat');
 var nib = require('nib');
 var stylus = require('gulp-stylus');
@@ -48,9 +48,10 @@ var logErrors = function() {
 }
 
 
-gulp.task('clean', function() {
-  return gulp.src([ paths.buildFolder], {read: false})
-    .pipe(clean());
+gulp.task('clean', function(cb) {
+  del([
+    paths.buildFolder
+  ], cb);
 });
 
 

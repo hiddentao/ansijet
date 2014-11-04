@@ -354,7 +354,7 @@ test['dashboard'] = {
             Q.promisify(self.trigger.save).call(self.trigger)
           ].concat(
             self.jobs.map(function(j) {
-              Q.promisify(j.save).call(j) 
+              return Q.promisify(j.save).call(j);
             })
           ));
         })
