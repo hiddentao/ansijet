@@ -5,7 +5,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "build": "NODE_ENV=test node --harmony `which gulp` build",
+    "build": "node --harmony `which gulp` build",
     "test": "NODE_ENV=test node --harmony `which gulp` test",
     "ci": "NODE_ENV=test node --harmony `which gulp` ci"
   },
