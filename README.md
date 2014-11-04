@@ -37,7 +37,7 @@ Installation instructions: [http://nodejs.org/](http://nodejs.org/).
 Ensure the installed version is at least **0.11.2**. Ansijet will not work with 
 earlier versions.
 
-_(For Ubuntu users I recommend the [Chris Lea PPA](https://launchpad.net/~chris-lea/+archive/node.js/))_.
+_(For Ubuntu users I recommend the [Chris Lea PPA](https://launchpad.net/~chris-lea/+archive/ubuntu/node.js-devel))_.
 
 **Pre-requisite: MongoDB**
 
