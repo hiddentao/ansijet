@@ -136,6 +136,7 @@ Exec.prototype._onError = function(defer) {
       err.message = 'Killed by Ansijet: ' + self._killReason;
     } else {
       err.exitCode = err.code || -1;
+      err.message = 'Command failed: ' + self._cmd;
     }
 
     err.stdout = self._stdout;

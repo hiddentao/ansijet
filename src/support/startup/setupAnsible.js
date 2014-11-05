@@ -20,8 +20,9 @@ module.exports = function*(app) {
   debug('Finding ansible-playbook binary');
 
   try {
-    app.config.ansiblePlaybookBin = 
-      ((yield exec('which ansible-playbook')).stdout || '').trim();
+    var result = yield exec('which ansible-playbook');
+
+    app.config.ansiblePlaybookBin = (result.stdout || '').trim();
 
     if ('' === app.config.ansiblePlaybookBin) {
       throw new Error('Not found');
