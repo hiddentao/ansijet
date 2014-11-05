@@ -19,14 +19,19 @@ var exec = waigo.load('support/exec-then');
 module.exports = function*(app) {
   debug('Finding ansible-playbook binary');
 
-  app.config.ansiblePlaybookBin = 
-    ((yield exec('which ansible-playbook')).stdout || '').trim();
+  try {
+    app.config.ansiblePlaybookBin = 
+      ((yield exec('which ansible-playbook')).stdout || '').trim();
 
-  if ('' === app.config.ansiblePlaybookBin) {
-    throw new Error('Unable to find ansible-playbook binary');
-  } else {
-    app.logger.info('Ansible playbook binary: ' + app.config.ansiblePlaybookBin);
+    if ('' === app.config.ansiblePlaybookBin) {
+      throw new Error('Not found');
+    } else {
+      app.logger.info('Ansible playbook binary: ' + app.config.ansiblePlaybookBin);
+    }
+  } catch (err) {
+    app.logger.error('Unable to find ansible-playbook binary', err);
   }
+
 
   debug('Loading Ansible playbooks');
 
