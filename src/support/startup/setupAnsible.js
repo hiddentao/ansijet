@@ -25,13 +25,12 @@ module.exports = function*(app) {
 
     if ('' === app.config.ansiblePlaybookBin) {
       throw new Error('Not found');
-    } else {
-      app.logger.info('Ansible playbook binary: ' + app.config.ansiblePlaybookBin);
     }
   } catch (err) {
-    app.logger.error('Unable to find ansible-playbook binary', err);
+    throw new Error('Unable to find ansible-playbook binary', err);
   }
 
+  app.logger.info('Ansible playbook binary: ' + app.config.ansiblePlaybookBin);
 
   debug('Loading Ansible playbooks');
 
